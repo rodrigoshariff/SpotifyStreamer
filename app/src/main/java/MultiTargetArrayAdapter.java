@@ -13,30 +13,18 @@ import app.com.example.android.spotifystreamer.R;
  */
 public class MultiTargetArrayAdapter extends ArrayAdapter<String>{
     private final Context context;
-    private final String[] values;
 
     public MultiTargetArrayAdapter(Context context, String[] artistName, String[] imageUrls) {
-        super(context, -1, values);
+        super(context, -1, imageUrls);
         this.context = context;
-        this.values = values;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.rowlayout, parent, false);
-        TextView textView = (TextView) rowView.findViewById(R.id.label);
-        ImageView imageView = (ImageView) rowView.findViewById(R.id.icon);
-        textView.setText(values[position]);
-        // change the icon for Windows and iPhone
-        String s = values[position];
-        if (s.startsWith("iPhone")) {
-            imageView.setImageResource(R.drawable.no);
-        } else {
-            imageView.setImageResource(R.drawable.ok);
-        }
-
-        return rowView;
+        TextView textView = (TextView) convertView.findViewById(R.id.list_item_search_artist_name);
+        ImageView imageView = (ImageView) convertView.findViewById(R.id.icon);
+        return convertView;
     }
 }
