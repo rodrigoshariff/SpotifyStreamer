@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,18 +22,14 @@ import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
+import kaaes.spotify.webapi.android.models.Image;
 
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class MainActivityFragment extends Fragment {
 
-    ArrayAdapter<String> mSearchArtistAdapter;
-    List<String> artistsName = new ArrayList<String>();
+    ImageAndTextArrayAdapter mSearchArtistAdapter;
     List<String> spotifyId = new ArrayList<String>();
-    List<String> artistImageURL = new ArrayList<String>();
-
+    List<RowItem> artistNameAndImageURL = new ArrayList<>();
 
     public MainActivityFragment() {
     }
@@ -44,57 +39,47 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        //mSearchArtistAdapter.clear();
-        //mSearchArtistAdapter.notifyDataSetChanged();
-
+        final ListView listView = (ListView) rootView.findViewById(R.id.listview_artists);
         EditText editText = (EditText) rootView.findViewById(R.id.searchText);
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView editText, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    //populate listview using spotify API
-                    //Context context = getActivity();
+                    if (editText.getText() != "") {
 
-                    ListView listView = (ListView) rootView.findViewById(R.id.listview_artists);
+                        editText.clearFocus();
 
-                    QueryArtistsFromSpotify artistSearch = new QueryArtistsFromSpotify();
-                    artistSearch.execute(editText.getText().toString());
-                    refreshListView(rootView);
-                    editText.clearFocus();
+                        //populate listwiew with spotify query results
+                        QueryArtistsFromSpotify artistSearch = new QueryArtistsFromSpotify();
+                        artistSearch.execute(editText.getText().toString());
+                        refreshListView(rootView);
 
+                        //hide keyboard
+                        InputMethodManager in = (InputMethodManager) getActivity().
+                                getSystemService(Context.INPUT_METHOD_SERVICE);
+                        in.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 
-                    InputMethodManager in = (InputMethodManager)getActivity().
-                            getSystemService(Context.INPUT_METHOD_SERVICE);
-                    in.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-
-
-                    return true;
+                        return true;
+                    } else {
+                        listView.invalidateViews();
+                    }
                 }
                 return false;
             }
         });
-
         return rootView;
-
     }
+
 
     private void refreshListView(View rootView){
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_artists);
-        mSearchArtistAdapter = new ArrayAdapter<String>(
-                getActivity(), // The current context (this activity)
-                R.layout.list_item_search_artist, // The name of the layout ID.
-                R.id.list_item_search_artist_name, // The ID of the textview to populate.
-                artistsName);
-        mSearchArtistAdapter.notifyDataSetChanged();
+        mSearchArtistAdapter = new ImageAndTextArrayAdapter(getActivity(),
+                R.id.list_item_search_artist, artistNameAndImageURL );
 
         listView.setAdapter(mSearchArtistAdapter);
 
-
-
     }
-
-
 
 
     private class QueryArtistsFromSpotify extends AsyncTask<String, Void, ArtistsPager> {
@@ -109,38 +94,33 @@ public class MainActivityFragment extends Fragment {
             ArtistsPager artistsPager = spotifyService.searchArtists(params[0]);
 
             return artistsPager;
-
         }
+
 
         @Override
         protected void onPostExecute(ArtistsPager artistsPager) {
             //super.onPostExecute(artistsPager);
-            artistsName.clear();
-            //List<Artist> artistsList = artistsPager.artists.items;
+            artistNameAndImageURL.clear();
+            String aName = "No Name";
+            String aImageUrl = "http://www.gstatic.com/webp/gallery/1.jpg";
 
             for(Artist a : artistsPager.artists.items) {
                 Log.d("NAME", "-----------> " + a.name.toString() + " : ");
-                artistsName.add(a.name.toString());
-                //spotifyId.add(a.id);
 
-/*                for (Image imgUrl : a.images ){
+                aName = a.name.toString();
+                spotifyId.add(a.id);
+
+                for (Image imgUrl : a.images ){
                     Log.d("IMAGES", "-----------> " + imgUrl.url + " : ");
-                    if(imgUrl.width <=100){
-                        artistImageURL.add(imgUrl.url);
+                    if(imgUrl.width <=300){
+                        aImageUrl = imgUrl.url.toString();
                     }
-                }*/
-
+                }
+                RowItem artistItem = new RowItem(aName, aImageUrl);
+                artistNameAndImageURL.add(artistItem);
             }
-
-
-
-
+            mSearchArtistAdapter.notifyDataSetChanged();
         }
     }
-
-
-
-
-
 
 }
