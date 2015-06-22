@@ -1,6 +1,7 @@
 package app.com.example.android.spotifystreamer;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,9 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +70,24 @@ public class MainActivityFragment extends Fragment {
                 return false;
             }
         });
+
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                RowItem artistItem = mSearchArtistAdapter.getItem(position);
+                String artistID = spotifyId.get(position);
+                Toast.makeText(getActivity(), artistItem.getTextViewText() + " " + artistID, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), ArtistTopTenActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, artistID);
+                startActivity(intent);
+            }
+        });
+
+
         return rootView;
+
     }
 
 
@@ -106,6 +126,7 @@ public class MainActivityFragment extends Fragment {
 
             for(Artist a : artistsPager.artists.items) {
                 Log.d("NAME", "-----------> " + a.name.toString() + " : ");
+                Log.d("ID", "-----------> " + a.id.toString() + " : ");
 
                 aName = a.name.toString();
                 spotifyId.add(a.id);
