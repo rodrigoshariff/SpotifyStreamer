@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +32,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
 
     ImageAndTwoTextsArrayAdapter mTop10SongsAdapter;
     List<RowItemSong> songNameAndImageURL = new ArrayList<>();
+    String artistName = "";
 
     public ArtistTopTenActivityFragment() {
     }
@@ -39,13 +42,21 @@ public class ArtistTopTenActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         final View rootView = inflater.inflate(R.layout.fragment_artist_top_ten, container, false);
+
         // The detail Activity called via intent.  Inspect the intent for forecast data.
         Intent intent = getActivity().getIntent();
 
-        if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-            String artistID = intent.getStringExtra(Intent.EXTRA_TEXT);
-            
-           QueryArtistsTop10FromSpotify artistTop10Search = new QueryArtistsTop10FromSpotify();
+        if (intent != null) //&& intent.hasExtra(Intent.EXTRA_TEXT)) {
+        {
+            //String artistID = intent.getStringExtra(Intent.EXTRA_TEXT);
+
+            String[] IdAndNameArray = intent.getStringArrayExtra("IdAndNameArray");
+            String artistID = IdAndNameArray[0];
+            String artistName = IdAndNameArray[1];
+
+            ((ActionBarActivity) getActivity()).getSupportActionBar().setSubtitle(artistName);
+
+          QueryArtistsTop10FromSpotify artistTop10Search = new QueryArtistsTop10FromSpotify();
             artistTop10Search.execute(artistID);
 
            ListView listView = (ListView) rootView.findViewById(R.id.listview_artistsTop10);
