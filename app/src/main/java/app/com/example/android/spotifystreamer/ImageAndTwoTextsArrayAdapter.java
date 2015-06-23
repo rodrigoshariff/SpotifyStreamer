@@ -13,14 +13,14 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 /**
- * Created by rodrigoshariff on 6/20/2015.
+ * Created by rodrigoshariff on 6/22/2015.
  */
+public class ImageAndTwoTextsArrayAdapter extends ArrayAdapter<RowItemSong> {
 
-public class ImageAndTextArrayAdapter extends ArrayAdapter<RowItemArtist> {
 
     private final Activity context;
 
-    public ImageAndTextArrayAdapter(Activity context, int resourceId, List<RowItemArtist> items) {
+    public ImageAndTwoTextsArrayAdapter(Activity context, int resourceId, List<RowItemSong> items) {
         super(context, resourceId, items);
         this.context= context;
 
@@ -29,27 +29,35 @@ public class ImageAndTextArrayAdapter extends ArrayAdapter<RowItemArtist> {
     /*private view holder class*/
     private class ViewHolder {
         ImageView imageView;
-        TextView txtTitle;
+        TextView txtSong;
+        TextView txtAlbum;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
-        RowItemArtist rowItemArtist = getItem(position);
+        RowItemSong rowItemSong = getItem(position);
 
         LayoutInflater mInflater = (LayoutInflater) context
                 .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.list_item_search_artist, null);
+            convertView = mInflater.inflate(R.layout.list_item_top10, null);
             holder = new ViewHolder();
-            holder.txtTitle = (TextView) convertView.findViewById(R.id.list_item_search_artist_name);
-            holder.imageView = (ImageView) convertView.findViewById(R.id.list_item_search_artist_image);
+            holder.txtSong = (TextView) convertView.findViewById(R.id.list_item_top10_song);
+            holder.txtAlbum = (TextView) convertView.findViewById(R.id.list_item_album);
+            holder.imageView = (ImageView) convertView.findViewById(R.id.list_item_top10_image);
             convertView.setTag(holder);
         } else
             holder = (ViewHolder) convertView.getTag();
 
-        holder.txtTitle.setText(rowItemArtist.getTextViewText());
-        Picasso.with(context).load(rowItemArtist.getImgURL()).into(holder.imageView);
+        holder.txtSong.setText(rowItemSong.gettextViewSong());
+        holder.txtAlbum.setText(rowItemSong.gettextViewAlbum());
+        Picasso.with(context).load(rowItemSong.getImgURL()).into(holder.imageView);
 
         return convertView;
     }
+
+
+
+
+
 }

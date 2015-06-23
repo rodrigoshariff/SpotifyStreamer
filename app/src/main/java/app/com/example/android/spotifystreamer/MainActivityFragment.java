@@ -32,7 +32,7 @@ public class MainActivityFragment extends Fragment {
 
     ImageAndTextArrayAdapter mSearchArtistAdapter;
     List<String> spotifyId = new ArrayList<String>();
-    List<RowItem> artistNameAndImageURL = new ArrayList<>();
+    List<RowItemArtist> artistNameAndImageURL = new ArrayList<>();
 
     public MainActivityFragment() {
     }
@@ -48,7 +48,9 @@ public class MainActivityFragment extends Fragment {
             @Override
             public boolean onEditorAction(TextView editText, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    if (editText.getText() != "") {
+                    spotifyId.clear();
+                    artistNameAndImageURL.clear();
+                    if (editText.getText() != "" && editText.getText() != null && editText.length()>0) {
 
                         editText.clearFocus();
 
@@ -64,6 +66,7 @@ public class MainActivityFragment extends Fragment {
 
                         return true;
                     } else {
+                        Toast.makeText(getActivity(),"Please enter the name of the artist", Toast.LENGTH_SHORT).show();
                         listView.invalidateViews();
                     }
                 }
@@ -76,9 +79,9 @@ public class MainActivityFragment extends Fragment {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                RowItem artistItem = mSearchArtistAdapter.getItem(position);
+                RowItemArtist artistItem = mSearchArtistAdapter.getItem(position);
                 String artistID = spotifyId.get(position);
-                Toast.makeText(getActivity(), artistItem.getTextViewText() + " " + artistID, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), artistItem.getTextViewText() + " " + artistID, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getActivity(), ArtistTopTenActivity.class)
                         .putExtra(Intent.EXTRA_TEXT, artistID);
                 startActivity(intent);
@@ -124,23 +127,29 @@ public class MainActivityFragment extends Fragment {
             String aName = "No Name";
             String aImageUrl = "http://www.gstatic.com/webp/gallery/1.jpg";
 
-            for(Artist a : artistsPager.artists.items) {
-                Log.d("NAME", "-----------> " + a.name.toString() + " : ");
-                Log.d("ID", "-----------> " + a.id.toString() + " : ");
-
-                aName = a.name.toString();
-                spotifyId.add(a.id);
-
-                for (Image imgUrl : a.images ){
-                    Log.d("IMAGES", "-----------> " + imgUrl.url + " : ");
-                    if(imgUrl.width <=300){
-                        aImageUrl = imgUrl.url.toString();
-                    }
-                }
-                RowItem artistItem = new RowItem(aName, aImageUrl);
-                artistNameAndImageURL.add(artistItem);
+            if (artistsPager.artists.items.size() == 0)
+            {
+                Toast.makeText(getActivity(),"Your search did not return any artist", Toast.LENGTH_SHORT).show();
             }
-            mSearchArtistAdapter.notifyDataSetChanged();
+            else {
+                for (Artist a : artistsPager.artists.items) {
+                    Log.d("NAME", "-----------> " + a.name.toString() + " : ");
+                    Log.d("ID", "-----------> " + a.id.toString() + " : ");
+
+                    aName = a.name.toString();
+                    spotifyId.add(a.id);
+
+                    for (Image imgUrl : a.images) {
+                        Log.d("IMAGES", "-----------> " + imgUrl.url + " : ");
+                        if (imgUrl.width <= 300) {
+                            aImageUrl = imgUrl.url.toString();
+                        }
+                    }
+                    RowItemArtist artistItem = new RowItemArtist(aName, aImageUrl);
+                    artistNameAndImageURL.add(artistItem);
+                }
+                mSearchArtistAdapter.notifyDataSetChanged();
+            }
         }
     }
 

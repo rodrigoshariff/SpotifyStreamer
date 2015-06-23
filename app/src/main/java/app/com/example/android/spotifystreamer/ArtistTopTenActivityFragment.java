@@ -11,7 +11,9 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
@@ -20,13 +22,14 @@ import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.Tracks;
 
 
+
 /**
  * A placeholder fragment containing a simple view.
  */
 public class ArtistTopTenActivityFragment extends Fragment {
 
-    ImageAndTextArrayAdapter mTop10SongsAdapter;
-    List<RowItem> songNameAndImageURL = new ArrayList<>();
+    ImageAndTwoTextsArrayAdapter mTop10SongsAdapter;
+    List<RowItemSong> songNameAndImageURL = new ArrayList<>();
 
     public ArtistTopTenActivityFragment() {
     }
@@ -41,12 +44,12 @@ public class ArtistTopTenActivityFragment extends Fragment {
 
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             String artistID = intent.getStringExtra(Intent.EXTRA_TEXT);
-
+            
            QueryArtistsTop10FromSpotify artistTop10Search = new QueryArtistsTop10FromSpotify();
             artistTop10Search.execute(artistID);
 
-           ListView listView = (ListView) rootView.findViewById(R.id.listview_artists);
-            mTop10SongsAdapter = new ImageAndTextArrayAdapter(getActivity(),
+           ListView listView = (ListView) rootView.findViewById(R.id.listview_artistsTop10);
+            mTop10SongsAdapter = new ImageAndTwoTextsArrayAdapter(getActivity(),
                     R.id.list_item_top10, songNameAndImageURL );
 
             listView.setAdapter(mTop10SongsAdapter);
@@ -66,7 +69,9 @@ public class ArtistTopTenActivityFragment extends Fragment {
 
             SpotifyApi spotifyApi = new SpotifyApi();
             SpotifyService spotifyService = spotifyApi.getService();
-            Tracks topTracks = spotifyService.getArtistTopTrack(params[0]);
+            Map<String, Object> map = new HashMap<>();
+            map.put("country", "US");
+            Tracks topTracks = spotifyService.getArtistTopTrack(params[0],map);
 
             return topTracks;
         }
@@ -74,14 +79,16 @@ public class ArtistTopTenActivityFragment extends Fragment {
         @Override
         protected void onPostExecute(Tracks topTracks) {
             //super.onPostExecute(artistsPager);
-            songNameAndImageURL.clear();
-            String aName = "No Name";
+            //songNameAndImageURL.clear();
+            String songName = "No Name";
+            String albumName = "No Name";
             String aImageUrl = "http://www.gstatic.com/webp/gallery/1.jpg";
 
             for(Track t : topTracks.tracks) {
                 Log.d("NAME", "-----------> " + t.name.toString() + " : ");
                 Log.d("NAME", "-----------> " + t.album + " : ");
-                aName = t.name.toString();
+                songName = t.name.toString();
+                albumName = t.album.name;
 
                 for (Image imgUrl : t.album.images){
                     Log.d("IMAGES", "-----------> " + imgUrl.url + " : ");
@@ -89,8 +96,8 @@ public class ArtistTopTenActivityFragment extends Fragment {
                         aImageUrl = imgUrl.url.toString();
                     }
                 }
-                RowItem artistItem = new RowItem(aName, aImageUrl);
-                songNameAndImageURL.add(artistItem);
+                RowItemSong songItem = new RowItemSong(songName, albumName, aImageUrl);
+                songNameAndImageURL.add(songItem);
             }
             mTop10SongsAdapter.notifyDataSetChanged();
         }
