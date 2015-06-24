@@ -44,7 +44,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
 
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             String artistID = intent.getStringExtra(Intent.EXTRA_TEXT);
-            
+
            QueryArtistsTop10FromSpotify artistTop10Search = new QueryArtistsTop10FromSpotify();
             artistTop10Search.execute(artistID);
 
