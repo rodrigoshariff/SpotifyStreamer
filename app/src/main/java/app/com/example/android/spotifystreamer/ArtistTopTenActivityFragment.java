@@ -3,8 +3,8 @@ package app.com.example.android.spotifystreamer;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -52,17 +52,16 @@ public class ArtistTopTenActivityFragment extends Fragment {
 
             String[] IdAndNameArray = intent.getStringArrayExtra("IdAndNameArray");
             String artistID = IdAndNameArray[0];
-            String artistName = IdAndNameArray[1];
+            artistName = IdAndNameArray[1];
 
             ((ActionBarActivity) getActivity()).getSupportActionBar().setSubtitle(artistName);
 
-          QueryArtistsTop10FromSpotify artistTop10Search = new QueryArtistsTop10FromSpotify();
+            QueryArtistsTop10FromSpotify artistTop10Search = new QueryArtistsTop10FromSpotify();
             artistTop10Search.execute(artistID);
 
-           ListView listView = (ListView) rootView.findViewById(R.id.listview_artistsTop10);
+            ListView listView = (ListView) rootView.findViewById(R.id.listview_artistsTop10);
             mTop10SongsAdapter = new ImageAndTwoTextsArrayAdapter(getActivity(),
                     R.id.list_item_top10, songNameAndImageURL );
-
             listView.setAdapter(mTop10SongsAdapter);
 
         }
@@ -71,9 +70,35 @@ public class ArtistTopTenActivityFragment extends Fragment {
     }
 
 
-    private class QueryArtistsTop10FromSpotify extends AsyncTask<String, Void, Tracks> {
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save the user's current game state
+        //savedInstanceState.putString("artistName", artistName);
+        savedInstanceState.putParcelableArrayList("SongsArray", (ArrayList < ?extends Parcelable>) songNameAndImageURL);
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+    }
 
-        private final String LOG_TAG = QueryArtistsTop10FromSpotify.class.getSimpleName();
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState); // Always call the superclass first
+
+        // Check whether we're recreating a previously destroyed instance
+        if (savedInstanceState != null) {
+            // Restore value of members from saved state
+            List<RowItemSong> savedSongNameAndImageURL = new ArrayList<>();
+            savedSongNameAndImageURL = savedInstanceState.getParcelableArrayList("SongsArray");
+            Log.d("SavedInstanceArray", "-----------> " + savedSongNameAndImageURL.get(0).gettextViewSong());
+        } else {
+            // Probably initialize members with default values for a new instance
+        }
+    }
+
+
+
+
+
+    private class QueryArtistsTop10FromSpotify extends AsyncTask<String, Void, Tracks> {
 
         @Override
         protected Tracks doInBackground(String... params) {
