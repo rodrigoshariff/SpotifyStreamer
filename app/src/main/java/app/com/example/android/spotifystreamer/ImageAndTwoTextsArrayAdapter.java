@@ -15,12 +15,12 @@ import java.util.List;
 /**
  * Created by rodrigoshariff on 6/22/2015.
  */
-public class ImageAndTwoTextsArrayAdapter extends ArrayAdapter<RowItemSong> {
+public class ImageAndTwoTextsArrayAdapter extends ArrayAdapter<RowItemFiveStrings> {
 
 
     private final Activity context;
 
-    public ImageAndTwoTextsArrayAdapter(Activity context, int resourceId, List<RowItemSong> items) {
+    public ImageAndTwoTextsArrayAdapter(Activity context, int resourceId, List<RowItemFiveStrings> items) {
         super(context, resourceId, items);
         this.context= context;
 
@@ -35,7 +35,7 @@ public class ImageAndTwoTextsArrayAdapter extends ArrayAdapter<RowItemSong> {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
-        RowItemSong rowItemSong = getItem(position);
+        RowItemFiveStrings rowItemSong = getItem(position);
 
         LayoutInflater mInflater = (LayoutInflater) context
                 .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
@@ -49,9 +49,9 @@ public class ImageAndTwoTextsArrayAdapter extends ArrayAdapter<RowItemSong> {
         } else
             holder = (ViewHolder) convertView.getTag();
 
-        holder.txtSong.setText(rowItemSong.gettextViewSong());
-        holder.txtAlbum.setText(rowItemSong.gettextViewAlbum());
-        Picasso.with(context).load(rowItemSong.getImgURL()).into(holder.imageView);
+        holder.txtSong.setText(rowItemSong.gettextColumn0());
+        holder.txtAlbum.setText(rowItemSong.gettextColumn1());
+        Picasso.with(context).load(rowItemSong.gettextColumn2()).into(holder.imageView);
 
         return convertView;
     }

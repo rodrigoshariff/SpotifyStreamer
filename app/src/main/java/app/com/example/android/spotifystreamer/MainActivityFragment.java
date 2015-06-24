@@ -31,22 +31,11 @@ import kaaes.spotify.webapi.android.models.Image;
 public class MainActivityFragment extends Fragment {
 
     ImageAndTextArrayAdapter mSearchArtistAdapter;
-    List<String> spotifyId = new ArrayList<String>();
-    List<RowItemArtist> artistNameAndImageURL = new ArrayList<>();
+    List<RowItemFiveStrings> artistNameAndImageURL = new ArrayList<>();
     String searchText ="";
 
     public MainActivityFragment() {
     }
-
-    /*@Override
-      public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if ((savedInstanceState != null) && (savedInstanceState.getString("searchText") != null)) {
-            searchText = savedInstanceState.getString("searchText");
-        }
-    }*/
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,7 +50,6 @@ public class MainActivityFragment extends Fragment {
             @Override
             public boolean onEditorAction(TextView editText, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    spotifyId.clear();
                     artistNameAndImageURL.clear();
                     if (editText.getText() != "" && editText.getText() != null && editText.length() > 0) {
 
@@ -88,14 +76,14 @@ public class MainActivityFragment extends Fragment {
             }
         });
 
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                RowItemArtist artistItem = mSearchArtistAdapter.getItem(position);
-                String artistID = spotifyId.get(position);
-                String idAndName[] = {artistID, artistNameAndImageURL.get(position).getTextViewText()};
+                RowItemFiveStrings artistItem = mSearchArtistAdapter.getItem(position);
+                //String artistID = spotifyId.get(position);
+                String artistID = artistNameAndImageURL.get(position).gettextColumn2();
+                String idAndName[] = {artistID, artistNameAndImageURL.get(position).gettextColumn0()};
 
                 //Toast.makeText(getActivity(), artistItem.getTextViewText() + " " + artistID, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getActivity(), ArtistTopTenActivity.class);
@@ -106,7 +94,6 @@ public class MainActivityFragment extends Fragment {
             }
         });
 
-
         return rootView;
 
     }
@@ -116,7 +103,6 @@ public class MainActivityFragment extends Fragment {
         super.onSaveInstanceState(state);
         state.putString("searchText", searchText);
     }
-
 
 
     private void refreshListView(View rootView){
@@ -150,7 +136,8 @@ public class MainActivityFragment extends Fragment {
             //super.onPostExecute(artistsPager);
             artistNameAndImageURL.clear();
             String aName = "No Name";
-            String aImageUrl = "http://www.gstatic.com/webp/gallery/1.jpg";
+            String aImageUrl = "http://vignette2.wikia.nocookie.net/legendmarielu/images/b/b4/No_image_available.jpg/revision/latest?cb=20130511180903";
+            String aID = "No ID";
 
             if (artistsPager.artists.items.size() == 0)
             {
@@ -158,19 +145,20 @@ public class MainActivityFragment extends Fragment {
             }
             else {
                 for (Artist a : artistsPager.artists.items) {
-                    Log.d("NAME", "-----------> " + a.name.toString() + " : ");
-                    Log.d("ID", "-----------> " + a.id.toString() + " : ");
+                    //Log.d("NAME", "-----------> " + a.name.toString() + " : ");
+                    //Log.d("ID", "-----------> " + a.id.toString() + " : ");
 
                     aName = a.name.toString();
-                    spotifyId.add(a.id);
+                    aID = a.id.toString();
+                    //spotifyId.add(a.id);
 
                     for (Image imgUrl : a.images) {
-                        Log.d("IMAGES", "-----------> " + imgUrl.url + " : ");
-                        if (imgUrl.width <= 300) {
+                        //Log.d("IMAGES", "-----------> " + imgUrl.url + " : ");
+                        if (imgUrl.width <= 200) {
                             aImageUrl = imgUrl.url.toString();
                         }
                     }
-                    RowItemArtist artistItem = new RowItemArtist(aName, aImageUrl);
+                    RowItemFiveStrings artistItem = new RowItemFiveStrings(aName, aImageUrl, aID, "", "");
                     artistNameAndImageURL.add(artistItem);
                 }
                 mSearchArtistAdapter.notifyDataSetChanged();

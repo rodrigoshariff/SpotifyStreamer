@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,8 +32,8 @@ import kaaes.spotify.webapi.android.models.Tracks;
 public class ArtistTopTenActivityFragment extends Fragment {
 
     ImageAndTwoTextsArrayAdapter mTop10SongsAdapter;
-    List<RowItemSong> songNameAndImageURL = new ArrayList<>();
-    String artistName = "";
+    List<RowItemFiveStrings> songNameAndImageURL = new ArrayList<>();
+
 
     public ArtistTopTenActivityFragment() {
     }
@@ -52,20 +53,24 @@ public class ArtistTopTenActivityFragment extends Fragment {
 
             String[] IdAndNameArray = intent.getStringArrayExtra("IdAndNameArray");
             String artistID = IdAndNameArray[0];
-            artistName = IdAndNameArray[1];
+            String artistName = IdAndNameArray[1];
 
             ((ActionBarActivity) getActivity()).getSupportActionBar().setSubtitle(artistName);
 
-            QueryArtistsTop10FromSpotify artistTop10Search = new QueryArtistsTop10FromSpotify();
-            artistTop10Search.execute(artistID);
+            if(songNameAndImageURL.isEmpty() || (songNameAndImageURL.size() == 0)) {
 
-            ListView listView = (ListView) rootView.findViewById(R.id.listview_artistsTop10);
-            mTop10SongsAdapter = new ImageAndTwoTextsArrayAdapter(getActivity(),
-                    R.id.list_item_top10, songNameAndImageURL );
-            listView.setAdapter(mTop10SongsAdapter);
+                QueryArtistsTop10FromSpotify artistTop10Search = new QueryArtistsTop10FromSpotify();
+                artistTop10Search.execute(artistID);
+            }
+
+                ListView listView = (ListView) rootView.findViewById(R.id.listview_artistsTop10);
+                mTop10SongsAdapter = new ImageAndTwoTextsArrayAdapter(getActivity(),
+                        R.id.list_item_top10, songNameAndImageURL);
+                listView.setAdapter(mTop10SongsAdapter);
+
+
 
         }
-
         return rootView;
     }
 
@@ -74,29 +79,23 @@ public class ArtistTopTenActivityFragment extends Fragment {
     public void onSaveInstanceState(Bundle savedInstanceState) {
         // Save the user's current game state
         //savedInstanceState.putString("artistName", artistName);
-        savedInstanceState.putParcelableArrayList("SongsArray", (ArrayList < ?extends Parcelable>) songNameAndImageURL);
+        savedInstanceState.putParcelableArrayList("SongsArray", (ArrayList<? extends Parcelable>) songNameAndImageURL);
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState); // Always call the superclass first
+        super.onCreate(savedInstanceState);
 
         // Check whether we're recreating a previously destroyed instance
         if (savedInstanceState != null) {
             // Restore value of members from saved state
-            List<RowItemSong> savedSongNameAndImageURL = new ArrayList<>();
-            savedSongNameAndImageURL = savedInstanceState.getParcelableArrayList("SongsArray");
-            Log.d("SavedInstanceArray", "-----------> " + savedSongNameAndImageURL.get(0).gettextViewSong());
-        } else {
-            // Probably initialize members with default values for a new instance
+            //List<RowItemFiveStrings> savedSongNameAndImageURL = new ArrayList<>();
+            songNameAndImageURL = savedInstanceState.getParcelableArrayList("SongsArray");
+            Log.d("SavedInstanceArray", "-----------> " + songNameAndImageURL.get(0).gettextColumn0());
         }
     }
-
-
-
-
 
     private class QueryArtistsTop10FromSpotify extends AsyncTask<String, Void, Tracks> {
 
@@ -118,24 +117,37 @@ public class ArtistTopTenActivityFragment extends Fragment {
             //songNameAndImageURL.clear();
             String songName = "No Name";
             String albumName = "No Name";
-            String aImageUrl = "http://www.gstatic.com/webp/gallery/1.jpg";
+            String aImageUrlsmall = "http://vignette2.wikia.nocookie.net/legendmarielu/images/b/b4/No_image_available.jpg/revision/latest?cb=20130511180903";
+            String aImageUrllarge = "http://vignette2.wikia.nocookie.net/legendmarielu/images/b/b4/No_image_available.jpg/revision/latest?cb=20130511180903";
+            String previewUrl = "No Preview";
 
-            for(Track t : topTracks.tracks) {
-                Log.d("NAME", "-----------> " + t.name.toString() + " : ");
-                Log.d("NAME", "-----------> " + t.album + " : ");
-                songName = t.name.toString();
-                albumName = t.album.name;
-
-                for (Image imgUrl : t.album.images){
-                    Log.d("IMAGES", "-----------> " + imgUrl.url + " : ");
-                    if(imgUrl.width <=300){
-                        aImageUrl = imgUrl.url.toString();
-                    }
-                }
-                RowItemSong songItem = new RowItemSong(songName, albumName, aImageUrl);
-                songNameAndImageURL.add(songItem);
+            if (topTracks.tracks.size() == 0)
+            {
+                Toast.makeText(getActivity(),"There are no tracks for this artist", Toast.LENGTH_SHORT).show();
             }
-            mTop10SongsAdapter.notifyDataSetChanged();
+
+            else {
+                for (Track t : topTracks.tracks) {
+                    //Log.d("NAME", "-----------> " + t.name.toString() + " : ");
+                    //Log.d("NAME", "-----------> " + t.album + " : ");
+                    songName = t.name.toString();
+                    albumName = t.album.name;
+                    previewUrl = t.preview_url.toString();
+
+                    for (Image imgUrl : t.album.images) {
+                        //Log.d("IMAGES", "-----------> " + imgUrl.url + " : ");
+                        if (imgUrl.width <= 200) {
+                            aImageUrlsmall = imgUrl.url.toString();
+                        } else if (imgUrl.width <= 640) {
+                            aImageUrllarge = imgUrl.url.toString();
+                        }
+                    }
+                    RowItemFiveStrings songItem = new RowItemFiveStrings(songName, albumName, aImageUrlsmall, aImageUrllarge, previewUrl);
+                    songNameAndImageURL.add(songItem);
+                }
+
+                mTop10SongsAdapter.notifyDataSetChanged();
+            }
         }
     }
 

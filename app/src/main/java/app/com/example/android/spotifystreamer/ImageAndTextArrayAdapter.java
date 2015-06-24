@@ -16,11 +16,11 @@ import java.util.List;
  * Created by rodrigoshariff on 6/20/2015.
  */
 
-public class ImageAndTextArrayAdapter extends ArrayAdapter<RowItemArtist> {
+public class ImageAndTextArrayAdapter extends ArrayAdapter<RowItemFiveStrings> {
 
     private final Activity context;
 
-    public ImageAndTextArrayAdapter(Activity context, int resourceId, List<RowItemArtist> items) {
+    public ImageAndTextArrayAdapter(Activity context, int resourceId, List<RowItemFiveStrings> items) {
         super(context, resourceId, items);
         this.context= context;
 
@@ -34,7 +34,7 @@ public class ImageAndTextArrayAdapter extends ArrayAdapter<RowItemArtist> {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
-        RowItemArtist rowItemArtist = getItem(position);
+        RowItemFiveStrings rowItemArtist = getItem(position);
 
         LayoutInflater mInflater = (LayoutInflater) context
                 .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
@@ -47,8 +47,8 @@ public class ImageAndTextArrayAdapter extends ArrayAdapter<RowItemArtist> {
         } else
             holder = (ViewHolder) convertView.getTag();
 
-        holder.txtTitle.setText(rowItemArtist.getTextViewText());
-        Picasso.with(context).load(rowItemArtist.getImgURL()).into(holder.imageView);
+        holder.txtTitle.setText(rowItemArtist.gettextColumn0());
+        Picasso.with(context).load(rowItemArtist.gettextColumn1()).into(holder.imageView);
 
         return convertView;
     }
