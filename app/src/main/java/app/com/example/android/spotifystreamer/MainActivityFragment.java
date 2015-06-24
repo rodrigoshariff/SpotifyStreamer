@@ -33,9 +33,20 @@ public class MainActivityFragment extends Fragment {
     ImageAndTextArrayAdapter mSearchArtistAdapter;
     List<String> spotifyId = new ArrayList<String>();
     List<RowItemArtist> artistNameAndImageURL = new ArrayList<>();
+    String searchText ="";
 
     public MainActivityFragment() {
     }
+
+    /*@Override
+      public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if ((savedInstanceState != null) && (savedInstanceState.getString("searchText") != null)) {
+            searchText = savedInstanceState.getString("searchText");
+        }
+    }*/
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,14 +55,17 @@ public class MainActivityFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         final ListView listView = (ListView) rootView.findViewById(R.id.listview_artists);
         EditText editText = (EditText) rootView.findViewById(R.id.searchText);
+        if(searchText.length()>0) {editText.setText(searchText);};
+
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView editText, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     spotifyId.clear();
                     artistNameAndImageURL.clear();
-                    if (editText.getText() != "" && editText.getText() != null && editText.length()>0) {
+                    if (editText.getText() != "" && editText.getText() != null && editText.length() > 0) {
 
+                        searchText = editText.getText().toString();
                         editText.clearFocus();
 
                         //populate listwiew with spotify query results
@@ -66,7 +80,7 @@ public class MainActivityFragment extends Fragment {
 
                         return true;
                     } else {
-                        Toast.makeText(getActivity(),"Please enter the name of the artist", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Please enter the name of the artist", Toast.LENGTH_SHORT).show();
                         listView.invalidateViews();
                     }
                 }
@@ -81,10 +95,14 @@ public class MainActivityFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 RowItemArtist artistItem = mSearchArtistAdapter.getItem(position);
                 String artistID = spotifyId.get(position);
+                String idAndName[] = {artistID, artistNameAndImageURL.get(position).getTextViewText()};
+
                 //Toast.makeText(getActivity(), artistItem.getTextViewText() + " " + artistID, Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getActivity(), ArtistTopTenActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, artistID);
+                Intent intent = new Intent(getActivity(), ArtistTopTenActivity.class);
+                        //.putExtra(Intent.EXTRA_TEXT, artistID);
+                intent.putExtra("IdAndNameArray", idAndName);
                 startActivity(intent);
+
             }
         });
 
@@ -92,6 +110,13 @@ public class MainActivityFragment extends Fragment {
         return rootView;
 
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        state.putString("searchText", searchText);
+    }
+
 
 
     private void refreshListView(View rootView){
