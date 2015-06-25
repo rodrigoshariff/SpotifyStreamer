@@ -7,13 +7,23 @@
     <string name="title_activity_settings">Settings</string>
 
 
-    <string name="pref_country">United States</string>
-    <string name="pref_country_key">US</string>
+    <string name="pref_country_default">United States</string>
+    <string name="pref_country_key">country</string>
     <string name="pref_country_label">Country</string>
 
     <string name="pref_country_label_US">United States</string>
     <string name="pref_country_label_MX">Mexico</string>
+    <string name="pref_country_label_CA">Canada</string>
+    <string name="pref_country_label_CN">China</string>
+    <string name="pref_country_label_CO">Colombia</string>
+    <string name="pref_country_label_ES">Spain</string>
+    <string name="pref_country_label_FR">France</string>
     <string name="pref_country_US">US</string>
     <string name="pref_country_MX">MX</string>
+    <string name="pref_country_CA">CA</string>
+    <string name="pref_country_CN">CN</string>
+    <string name="pref_country_CO">CO</string>
+    <string name="pref_country_ES">ES</string>
+    <string name="pref_country_FR">FR</string>
 
 </resources>

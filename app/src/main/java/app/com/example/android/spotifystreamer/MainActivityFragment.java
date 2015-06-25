@@ -2,9 +2,12 @@ package app.com.example.android.spotifystreamer;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +34,8 @@ public class MainActivityFragment extends Fragment {
 
     ImageAndTextArrayAdapter mSearchArtistAdapter;
     List<RowItemFiveStrings> artistNameAndImageURL = new ArrayList<>();
-    String searchText ="";
+    String searchText = "";
+    String countryPref = "US";
 
     public MainActivityFragment() {
     }
@@ -39,11 +43,13 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        //countryPref=getString(R.string.pref_country_default);
 
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         final ListView listView = (ListView) rootView.findViewById(R.id.listview_artists);
         EditText editText = (EditText) rootView.findViewById(R.id.searchText);
         if(searchText.length()>0) {editText.setText(searchText);};
+
 
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -84,10 +90,15 @@ public class MainActivityFragment extends Fragment {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                countryPref = sharedPrefs.getString(getString(R.string.pref_country_key), getString(R.string.pref_country_US));
+                Log.d("COUNTRY_PREF", "-----------> " + countryPref);
+
+
                 RowItemFiveStrings artistItem = mSearchArtistAdapter.getItem(position);
-                //String artistID = spotifyId.get(position);
                 String artistID = artistNameAndImageURL.get(position).gettextColumn2();
-                String idAndName[] = {artistID, artistNameAndImageURL.get(position).gettextColumn0()};
+                String idAndName[] = {artistID, artistNameAndImageURL.get(position).gettextColumn0(), countryPref};
 
                 //Toast.makeText(getActivity(), artistItem.getTextViewText() + " " + artistID, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getActivity(), ArtistTopTenActivity.class);

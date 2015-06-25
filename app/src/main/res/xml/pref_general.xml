@@ -3,7 +3,7 @@
     android:layout_height="match_parent">
 
     <ListPreference
-        android:defaultValue="@string/pref_country"
+        android:defaultValue="@string/pref_country_default"
         android:entries="@array/pref_country_options"
         android:entryValues="@array/pref_country_values"
         android:key="@string/pref_country_key"

@@ -28,15 +28,11 @@ import kaaes.spotify.webapi.android.models.Tracks;
 
 
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class ArtistTopTenActivityFragment extends Fragment {
 
     ImageAndTwoTextsArrayAdapter mTop10SongsAdapter;
     List<RowItemFiveStrings> songNameAndImageURL = new ArrayList<>();
     String countryPref = "US";
-
 
     public ArtistTopTenActivityFragment() {
     }
@@ -52,17 +48,13 @@ public class ArtistTopTenActivityFragment extends Fragment {
 
         if (intent != null) //&& intent.hasExtra(Intent.EXTRA_TEXT)) {
         {
-
-            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            countryPref = sharedPrefs.getString(getString(R.string.pref_country_key), getString(R.string.pref_country_US));
-
-            Log.d("COUNTRY", "-----------> " + countryPref);
-
             String[] IdAndNameArray = intent.getStringArrayExtra("IdAndNameArray");
             String artistID = IdAndNameArray[0];
             String artistName = IdAndNameArray[1];
+            countryPref = IdAndNameArray[2];
+            Log.d("COUNTRY_PREF_Child", "-----------> " + countryPref);
 
-            ((ActionBarActivity) getActivity()).getSupportActionBar().setSubtitle(artistName);
+            ((ActionBarActivity) getActivity()).getSupportActionBar().setSubtitle(artistName + "  (" +countryPref+")");
 
             if(songNameAndImageURL.isEmpty() || (songNameAndImageURL.size() == 0)) {
 
@@ -112,7 +104,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
             SpotifyApi spotifyApi = new SpotifyApi();
             SpotifyService spotifyService = spotifyApi.getService();
             Map<String, Object> map = new HashMap<>();
-            map.put("country", "US");
+            map.put("country", countryPref);
             Tracks topTracks = spotifyService.getArtistTopTrack(params[0],map);
 
             return topTracks;

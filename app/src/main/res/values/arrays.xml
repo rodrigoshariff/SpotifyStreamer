@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string-array name="pref_country_options">
-        <item>@string/pref_country_label_US</item>
+        <item>@string/pref_country_label_CA</item>
+        <item>@string/pref_country_label_CO</item>
+        <item>@string/pref_country_label_ES</item>
+        <item>@string/pref_country_label_FR</item>
         <item>@string/pref_country_label_MX</item>
+        <item>@string/pref_country_label_US</item>
     </string-array>
 
     <string-array name="pref_country_values">
-        <item>@string/pref_country_US</item>
+        <item>@string/pref_country_CA</item>
+        <item>@string/pref_country_CO</item>
+        <item>@string/pref_country_ES</item>
+        <item>@string/pref_country_FR</item>
         <item>@string/pref_country_MX</item>
+        <item>@string/pref_country_US</item>
     </string-array>
-    +
 </resources>
