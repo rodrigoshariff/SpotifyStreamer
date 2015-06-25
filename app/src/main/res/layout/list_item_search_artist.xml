@@ -9,18 +9,19 @@
 
     <ImageView
         android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:id="@+id/list_item_search_artist_image"
         android:layout_weight="1"
-        android:layout_margin="10dp"/>
+        android:layout_margin="12dp"/>
     <TextView
         android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:text="Artist Name"
         android:id="@+id/list_item_search_artist_name"
         android:gravity="center_vertical"
-        android:layout_weight="2"
-        android:padding="15dp"
-        android:layout_margin="10dp"
+        android:layout_weight="2.8"
+        android:layout_margin="12dp"
+        android:textSize="17sp"
+
         android:textStyle="bold"/>
     </LinearLayout>

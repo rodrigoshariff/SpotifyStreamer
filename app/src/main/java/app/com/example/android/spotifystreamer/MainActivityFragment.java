@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,6 +67,11 @@ public class MainActivityFragment extends Fragment {
 
                         return true;
                     } else {
+
+                        InputMethodManager in = (InputMethodManager) getActivity().
+                                getSystemService(Context.INPUT_METHOD_SERVICE);
+                        in.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+
                         Toast.makeText(getActivity(), "Please enter the name of the artist", Toast.LENGTH_SHORT).show();
                         listView.invalidateViews();
                     }

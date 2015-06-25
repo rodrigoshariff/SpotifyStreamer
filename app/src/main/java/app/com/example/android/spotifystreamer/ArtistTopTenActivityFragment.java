@@ -1,9 +1,11 @@
 package app.com.example.android.spotifystreamer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -33,6 +35,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
 
     ImageAndTwoTextsArrayAdapter mTop10SongsAdapter;
     List<RowItemFiveStrings> songNameAndImageURL = new ArrayList<>();
+    String countryPref = "US";
 
 
     public ArtistTopTenActivityFragment() {
@@ -49,7 +52,11 @@ public class ArtistTopTenActivityFragment extends Fragment {
 
         if (intent != null) //&& intent.hasExtra(Intent.EXTRA_TEXT)) {
         {
-            //String artistID = intent.getStringExtra(Intent.EXTRA_TEXT);
+
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            countryPref = sharedPrefs.getString(getString(R.string.pref_country_key), getString(R.string.pref_country_US));
+
+            Log.d("COUNTRY", "-----------> " + countryPref);
 
             String[] IdAndNameArray = intent.getStringArrayExtra("IdAndNameArray");
             String artistID = IdAndNameArray[0];
