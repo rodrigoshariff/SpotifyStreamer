@@ -1,11 +1,9 @@
 package app.com.example.android.spotifystreamer;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -43,7 +41,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
 
         final View rootView = inflater.inflate(R.layout.fragment_artist_top_ten, container, false);
 
-        // The detail Activity called via intent.  Inspect the intent for forecast data.
+        //receive intent data from main activity
         Intent intent = getActivity().getIntent();
 
         if (intent != null) //&& intent.hasExtra(Intent.EXTRA_TEXT)) {
@@ -56,6 +54,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
 
             ((ActionBarActivity) getActivity()).getSupportActionBar().setSubtitle(artistName + "  (" +countryPref+")");
 
+            //only query Spotify if entering this view for the first time, otherwise restore from saved instance state
             if(songNameAndImageURL.isEmpty() || (songNameAndImageURL.size() == 0)) {
 
                 QueryArtistsTop10FromSpotify artistTop10Search = new QueryArtistsTop10FromSpotify();
@@ -67,13 +66,12 @@ public class ArtistTopTenActivityFragment extends Fragment {
                         R.id.list_item_top10, songNameAndImageURL);
                 listView.setAdapter(mTop10SongsAdapter);
 
-
-
         }
         return rootView;
     }
 
 
+    //save song data once back from Spotify API
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         // Save the user's current game state
@@ -137,10 +135,12 @@ public class ArtistTopTenActivityFragment extends Fragment {
                         //Log.d("IMAGES", "-----------> " + imgUrl.url + " : ");
                         if (imgUrl.width <= 200) {
                             aImageUrlsmall = imgUrl.url.toString();
-                        } else if (imgUrl.width <= 640) {
+                        } else if (imgUrl.width >500 && imgUrl.width <= 700) {
                             aImageUrllarge = imgUrl.url.toString();
                         }
                     }
+                    //populate list with song data to use in custom adapter to populate song listview.
+                    //also add now playing image and preview URL for future implementation
                     RowItemFiveStrings songItem = new RowItemFiveStrings(songName, albumName, aImageUrlsmall, aImageUrllarge, previewUrl);
                     songNameAndImageURL.add(songItem);
                 }

@@ -43,14 +43,13 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        //countryPref=getString(R.string.pref_country_default);
 
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         final ListView listView = (ListView) rootView.findViewById(R.id.listview_artists);
         EditText editText = (EditText) rootView.findViewById(R.id.searchText);
         if(searchText.length()>0) {editText.setText(searchText);};
 
-
+        //search click
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView editText, int actionId, KeyEvent event) {
@@ -73,7 +72,7 @@ public class MainActivityFragment extends Fragment {
 
                         return true;
                     } else {
-
+                        //hide keyboard
                         InputMethodManager in = (InputMethodManager) getActivity().
                                 getSystemService(Context.INPUT_METHOD_SERVICE);
                         in.hideSoftInputFromWindow(editText.getWindowToken(), 0);
@@ -86,20 +85,23 @@ public class MainActivityFragment extends Fragment {
             }
         });
 
+        //artist item click
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
+                //get selected country from settings or use default
                 SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
                 countryPref = sharedPrefs.getString(getString(R.string.pref_country_key), getString(R.string.pref_country_US));
                 Log.d("COUNTRY_PREF", "-----------> " + countryPref);
 
-
+                //prepare parameters to send to next activity/fragment
                 RowItemFiveStrings artistItem = mSearchArtistAdapter.getItem(position);
                 String artistID = artistNameAndImageURL.get(position).gettextColumn2();
                 String idAndName[] = {artistID, artistNameAndImageURL.get(position).gettextColumn0(), countryPref};
 
+                //send intent
                 //Toast.makeText(getActivity(), artistItem.getTextViewText() + " " + artistID, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getActivity(), ArtistTopTenActivity.class);
                         //.putExtra(Intent.EXTRA_TEXT, artistID);
@@ -113,6 +115,7 @@ public class MainActivityFragment extends Fragment {
 
     }
 
+    //save artist data once back from Spotify API
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
@@ -120,6 +123,7 @@ public class MainActivityFragment extends Fragment {
     }
 
 
+    //populate artist listview
     private void refreshListView(View rootView){
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_artists);
@@ -131,6 +135,7 @@ public class MainActivityFragment extends Fragment {
     }
 
 
+    //query Spotify API
     private class QueryArtistsFromSpotify extends AsyncTask<String, Void, ArtistsPager> {
 
         private final String LOG_TAG = QueryArtistsFromSpotify.class.getSimpleName();
@@ -173,6 +178,7 @@ public class MainActivityFragment extends Fragment {
                             aImageUrl = imgUrl.url.toString();
                         }
                     }
+                    //populate list to use in custom adapter to populate listview
                     RowItemFiveStrings artistItem = new RowItemFiveStrings(aName, aImageUrl, aID, "", "");
                     artistNameAndImageURL.add(artistItem);
                 }
