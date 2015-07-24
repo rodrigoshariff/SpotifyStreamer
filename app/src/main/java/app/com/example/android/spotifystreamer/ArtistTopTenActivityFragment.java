@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -31,6 +32,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
     ImageAndTwoTextsArrayAdapter mTop10SongsAdapter;
     List<RowItemFiveStrings> songNameAndImageURL = new ArrayList<>();
     String countryPref = "US";
+    String artistName = "";
 
     public ArtistTopTenActivityFragment() {
     }
@@ -40,6 +42,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         final View rootView = inflater.inflate(R.layout.fragment_artist_top_ten, container, false);
+        ListView listView = (ListView) rootView.findViewById(R.id.listview_artistsTop10);
 
         //receive intent data from main activity
         Intent intent = getActivity().getIntent();
@@ -48,7 +51,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
         {
             String[] IdAndNameArray = intent.getStringArrayExtra("IdAndNameArray");
             String artistID = IdAndNameArray[0];
-            String artistName = IdAndNameArray[1];
+            artistName = IdAndNameArray[1];
             countryPref = IdAndNameArray[2];
             Log.d("COUNTRY_PREF_Child", "-----------> " + countryPref);
 
@@ -61,12 +64,28 @@ public class ArtistTopTenActivityFragment extends Fragment {
                 artistTop10Search.execute(artistID);
             }
 
-                ListView listView = (ListView) rootView.findViewById(R.id.listview_artistsTop10);
+
                 mTop10SongsAdapter = new ImageAndTwoTextsArrayAdapter(getActivity(),
                         R.id.list_item_top10, songNameAndImageURL);
                 listView.setAdapter(mTop10SongsAdapter);
 
         }
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                Intent intent = new Intent(getActivity(), SimplePlayerActivity.class);
+                //.putExtra(Intent.EXTRA_TEXT, artistID);
+                intent.putParcelableArrayListExtra("TopTracksData", (ArrayList<? extends Parcelable>) songNameAndImageURL);
+                intent.putExtra("SelectedSong", position);
+                intent.putExtra("ArtistName", artistName);
+                startActivity(intent);
+
+            }
+        });
+
         return rootView;
     }
 

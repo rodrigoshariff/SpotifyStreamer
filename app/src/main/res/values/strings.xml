@@ -25,6 +25,6 @@
     <string name="pref_country_CO">CO</string>
     <string name="pref_country_ES">ES</string>
     <string name="pref_country_FR">FR</string>
-    <string name="title_activity_simple_player">SimplePlayerActivity</string>
+    <string name="title_activity_simple_player">Media Sampler</string>
 
 </resources>

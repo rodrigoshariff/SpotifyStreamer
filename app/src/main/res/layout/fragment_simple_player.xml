@@ -12,22 +12,26 @@
     <TextView
         android:id="@+id/artist_name"
         android:layout_width="match_parent"
-        android:layout_height="12dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="bottom|center_horizontal"
         android:text="Artist Name"
-        android:textSize="12sp"
-        android:textStyle="bold" />
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp" />
 
     <TextView
         android:id="@+id/album_name"
         android:layout_width="match_parent"
-        android:layout_height="12dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:gravity="center_horizontal"
+        android:gravity="center_vertical|center_horizontal"
         android:text="Album Name"
-        android:textSize="12sp"
-        android:textStyle="bold" />
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_marginRight="50dp"
+        android:layout_marginLeft="50dp" />
 
     <ImageView
         android:id="@+id/now_playing_thumbnail"
@@ -41,19 +45,20 @@
     <TextView
         android:id="@+id/track_name"
         android:layout_width="match_parent"
-        android:layout_height="12dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center_horizontal"
         android:text="Song Name"
-        android:textSize="12sp"
-        android:textStyle="bold" />
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp" />
 
     <SeekBar
         android:id="@+id/track_seekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1" />
+        android:layout_gravity="center_vertical" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -68,7 +73,8 @@
             android:layout_weight="1"
             android:gravity="left"
             android:text="0:00"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:layout_marginLeft="8dp" />
 
         <TextView
             android:id="@+id/track_end_time"
@@ -77,7 +83,8 @@
             android:layout_weight="1"
             android:gravity="right"
             android:text="0:00"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:layout_marginRight="3dp" />
 
     </LinearLayout>
 
@@ -107,7 +114,7 @@
             android:layout_marginRight="15dp"
             android:layout_weight="1"
             android:clickable="true"
-            android:src="@android:drawable/ic_media_play" />
+            android:src="@android:drawable/ic_media_pause" />
 
         <ImageButton
             android:id="@+id/next_track"

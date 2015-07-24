@@ -61,9 +61,13 @@ public class MainActivityFragment extends Fragment {
                         editText.clearFocus();
 
                         //populate listwiew with spotify query results
-                        QueryArtistsFromSpotify artistSearch = new QueryArtistsFromSpotify();
-                        artistSearch.execute(editText.getText().toString());
-                        refreshListView(rootView);
+                        try {
+                            QueryArtistsFromSpotify artistSearch = new QueryArtistsFromSpotify();
+                            artistSearch.execute(editText.getText().toString());
+                            refreshListView(rootView);
+                        }
+                        finally {
+                        }
 
                         //hide keyboard
                         InputMethodManager in = (InputMethodManager) getActivity().
