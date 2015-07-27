@@ -64,7 +64,6 @@ public class ArtistTopTenActivityFragment extends Fragment {
                 artistTop10Search.execute(artistID);
             }
 
-
                 mTop10SongsAdapter = new ImageAndTwoTextsArrayAdapter(getActivity(),
                         R.id.list_item_top10, songNameAndImageURL);
                 listView.setAdapter(mTop10SongsAdapter);
