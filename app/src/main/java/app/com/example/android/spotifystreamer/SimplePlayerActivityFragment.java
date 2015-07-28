@@ -5,14 +5,11 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -53,6 +50,7 @@ public class SimplePlayerActivityFragment extends Fragment {
         ImageView albumArt = (ImageView) rootView.findViewById(R.id.now_playing_thumbnail);
         TextView songNameTextView = (TextView) rootView.findViewById(R.id.track_name);
         final TextView trackTimer = (TextView) rootView.findViewById(R.id.track_start_time);
+        final TextView trackDuration = (TextView) rootView.findViewById(R.id.track_end_time);
         final SeekBar trackSeekBar = (SeekBar) rootView.findViewById(R.id.track_seekBar);
         final ImageButton play_pause = (ImageButton) rootView.findViewById(R.id.play_pause);
         final ImageButton next_track = (ImageButton) rootView.findViewById(R.id.next_track);
@@ -73,9 +71,8 @@ public class SimplePlayerActivityFragment extends Fragment {
             Log.d("Top track data", "-----------> " + TopTracksData);
 
             //((ActionBarActivity) getActivity()).getSupportActionBar().setSubtitle(artistName + "  (" +countryPref+")");
-            startPlayer(TopTracksData.get(NowPlayingSong).gettextColumn4(), trackSeekBar, trackTimer);
+            startPlayer(TopTracksData.get(NowPlayingSong).gettextColumn4(), trackSeekBar, trackTimer, trackDuration);
         }
-
 
 
         play_pause.setOnClickListener(new View.OnClickListener() {
@@ -92,7 +89,7 @@ public class SimplePlayerActivityFragment extends Fragment {
 
                     } else {                          // next or previous track button was clicked
                         myMediaPlayer.reset();
-                        startPlayer(TopTracksData.get(NowPlayingSong).gettextColumn4(), trackSeekBar, trackTimer);
+                        startPlayer(TopTracksData.get(NowPlayingSong).gettextColumn4(), trackSeekBar, trackTimer, trackDuration);
 
                     }
                     play_pause.setImageResource(android.R.drawable.ic_media_pause);
@@ -106,7 +103,7 @@ public class SimplePlayerActivityFragment extends Fragment {
                 myMediaPlayer.stop();
                 myMediaPlayer.reset();
                 pausedOrReset = "reset";
-                if (NowPlayingSong == 9) {
+                if (NowPlayingSong == TopTracksData.size()) {
                     NowPlayingSong = 0;
                 } else {
                     NowPlayingSong = NowPlayingSong + 1;
@@ -120,10 +117,19 @@ public class SimplePlayerActivityFragment extends Fragment {
         previous_track.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (NowPlayingSong > 0) {
+                    if (!myMediaPlayer.isPlaying()){
+                        NowPlayingSong = NowPlayingSong - 1;
+                    }
                     myMediaPlayer.stop();
                     myMediaPlayer.reset();
                     pausedOrReset = "reset";
-                    NowPlayingSong = NowPlayingSong - 1;
+                    refreshViewsAndStartPlayer(rootView);
+                    play_pause.setImageResource(android.R.drawable.ic_media_pause);
+                }
+                else {
+                    myMediaPlayer.stop();
+                    myMediaPlayer.reset();
+                    pausedOrReset = "reset";
                     refreshViewsAndStartPlayer(rootView);
                     play_pause.setImageResource(android.R.drawable.ic_media_pause);
                 }
@@ -131,18 +137,15 @@ public class SimplePlayerActivityFragment extends Fragment {
         });
 
 
-
         return rootView;
 
     }
 
-    private void startPlayer(String previewUrl, final SeekBar mySeekBar, final TextView trackTimer) {
+    private void startPlayer(String previewUrl, final SeekBar mySeekBar, final TextView trackTimer, final TextView trackDuration) {
         //Implement Service at later time
 //        Intent toServiceIntent = new Intent(getActivity(), StreamerService.class);
 //        toServiceIntent.putExtra(StreamerService.NOW_PLAYING_URL,previewUrl);
 //        getActivity().startService(toServiceIntent);
-
-        //final Handler mHandler = new Handler();
 
         myMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
@@ -158,27 +161,31 @@ public class SimplePlayerActivityFragment extends Fragment {
                 mPlayer.start();
 
                 finalTime = myMediaPlayer.getDuration();
+                trackDuration.setText(String.format("%d,%02d", TimeUnit.MILLISECONDS.toMinutes((long) finalTime),
+                        TimeUnit.MILLISECONDS.toSeconds((long) finalTime)));
                 mySeekBar.setMax((int) finalTime);
                 timeElapsed = myMediaPlayer.getCurrentPosition();
                 mySeekBar.setProgress((int) timeElapsed);
 
-                Runnable updateSeekBarTime = new Runnable() {
-                    public void run() {
-                        //get current position
-                        timeElapsed = myMediaPlayer.getCurrentPosition();
-                        //set seekbar progress
-                        mySeekBar.setProgress((int) timeElapsed);
-                        //set time remaing
-                        //double timeRemaining = finalTime - timeElapsed;
-                        trackTimer.setText(String.format("%d,%02d", TimeUnit.MILLISECONDS.toMinutes((long) timeElapsed),
-                                TimeUnit.MILLISECONDS.toSeconds((long) timeElapsed)));
-
-                        //repeat yourself that again in 100 miliseconds
-                        durationHandler.postDelayed(this, 100);
-                    }
-                };
-
-                durationHandler.postDelayed(updateSeekBarTime, 100);
+                try {
+                    Runnable updateSeekBarTime = new Runnable() {
+                        public void run() {
+                            //get current position
+                            timeElapsed = myMediaPlayer.getCurrentPosition();
+                            //set seekbar progress
+                            mySeekBar.setProgress((int) timeElapsed);
+                            trackTimer.setText(String.format("%d,%02d", TimeUnit.MILLISECONDS.toMinutes((long) timeElapsed),
+                                    TimeUnit.MILLISECONDS.toSeconds((long) timeElapsed)));
+                            //repeat in 100 miliseconds
+                            durationHandler.postDelayed(this, 100);
+                        }
+                    };
+                    durationHandler.postDelayed(updateSeekBarTime, 100);
+                }
+                catch (Exception e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
 
             }
         });
@@ -210,6 +217,7 @@ public class SimplePlayerActivityFragment extends Fragment {
         TextView songNameTextView = (TextView) rootView.findViewById(R.id.track_name);
         SeekBar trackSeekBar = (SeekBar) rootView.findViewById(R.id.track_seekBar);
         TextView trackTimer = (TextView) rootView.findViewById(R.id.track_start_time);
+        TextView trackDuration = (TextView) rootView.findViewById(R.id.track_end_time);
 
         artistNameTextView.setText(artistName);
         albumNameTextView.setText(TopTracksData.get(NowPlayingSong).gettextColumn1());
@@ -217,39 +225,45 @@ public class SimplePlayerActivityFragment extends Fragment {
         Picasso.with(getActivity()).load(TopTracksData.get(NowPlayingSong).gettextColumn3()).into(albumArt);
 
         trackSeekBar.setProgress(0);
-        startPlayer(TopTracksData.get(NowPlayingSong).gettextColumn4(), trackSeekBar, trackTimer);
+        startPlayer(TopTracksData.get(NowPlayingSong).gettextColumn4(), trackSeekBar, trackTimer, trackDuration );
     }
 
-    private void refreshViews(View rootView) {
-
-        TextView artistNameTextView = (TextView) rootView.findViewById(R.id.artist_name);
-        TextView albumNameTextView = (TextView) rootView.findViewById(R.id.album_name);
-        ImageView albumArt = (ImageView) rootView.findViewById(R.id.now_playing_thumbnail);
-        TextView songNameTextView = (TextView) rootView.findViewById(R.id.track_name);
-        SeekBar trackSeekBar = (SeekBar) rootView.findViewById(R.id.track_seekBar);
-        TextView trackTimer = (TextView) rootView.findViewById(R.id.track_start_time);
-
-        artistNameTextView.setText(artistName);
-        albumNameTextView.setText(TopTracksData.get(NowPlayingSong).gettextColumn1());
-        songNameTextView.setText(TopTracksData.get(NowPlayingSong).gettextColumn0());
-        Picasso.with(getActivity()).load(TopTracksData.get(NowPlayingSong).gettextColumn3()).into(albumArt);
-
-        trackSeekBar.setProgress(0);
-
-    }
+//    private void refreshViews(View rootView) {
+//
+//        TextView artistNameTextView = (TextView) rootView.findViewById(R.id.artist_name);
+//        TextView albumNameTextView = (TextView) rootView.findViewById(R.id.album_name);
+//        ImageView albumArt = (ImageView) rootView.findViewById(R.id.now_playing_thumbnail);
+//        TextView songNameTextView = (TextView) rootView.findViewById(R.id.track_name);
+//        SeekBar trackSeekBar = (SeekBar) rootView.findViewById(R.id.track_seekBar);
+//        TextView trackTimer = (TextView) rootView.findViewById(R.id.track_start_time);
+//
+//        artistNameTextView.setText(artistName);
+//        albumNameTextView.setText(TopTracksData.get(NowPlayingSong).gettextColumn1());
+//        songNameTextView.setText(TopTracksData.get(NowPlayingSong).gettextColumn0());
+//        Picasso.with(getActivity()).load(TopTracksData.get(NowPlayingSong).gettextColumn3()).into(albumArt);
+//
+//        trackSeekBar.setProgress(0);
+//
+//    }
 
     @Override
     public void onStop() {
+        durationHandler.removeCallbacksAndMessages(null);
+        if (myMediaPlayer != null) {
+            myMediaPlayer.release();
+            myMediaPlayer = null;
+        }
         super.onStop();
-        myMediaPlayer.release();
-        myMediaPlayer = null;
     }
 
     @Override
     public void onDestroy() {
+        durationHandler.removeCallbacksAndMessages(null);
+        if (myMediaPlayer != null) {
+            myMediaPlayer.release();
+            myMediaPlayer = null;
+        }
         super.onDestroy();
-        myMediaPlayer.release();
-        myMediaPlayer = null;
     }
 
 }
