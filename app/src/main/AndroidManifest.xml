@@ -23,6 +23,7 @@
         <activity
             android:name=".ArtistTopTenActivity"
             android:label="@string/title_activity_artist_topten"
+            android:launchMode="singleTop"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

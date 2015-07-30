@@ -77,18 +77,19 @@ public class SimplePlayerActivityFragment extends Fragment {
 
         play_pause.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (myMediaPlayer.isPlaying()) {
+                if (myMediaPlayer.isPlaying()) {  // pause button clicked
                     myMediaPlayer.pause();
                     //timer.setBase(myMediaPlayer.getCurrentPosition());
                     pausedOrReset = "";
                     play_pause.setImageResource(android.R.drawable.ic_media_play);
                 } else {
-                    if (pausedOrReset != "reset")  // play button clicked
+                    if (pausedOrReset != "reset")  // play button clicked from pause
                     {
                         myMediaPlayer.start();
 
                     } else {                          // next or previous track button was clicked
                         myMediaPlayer.reset();
+                        durationHandler.removeCallbacksAndMessages(null);
                         startPlayer(TopTracksData.get(NowPlayingSong).gettextColumn4(), trackSeekBar, trackTimer, trackDuration);
 
                     }
@@ -102,8 +103,9 @@ public class SimplePlayerActivityFragment extends Fragment {
             public void onClick(View v) {
                 myMediaPlayer.stop();
                 myMediaPlayer.reset();
+                durationHandler.removeCallbacksAndMessages(null);
                 pausedOrReset = "reset";
-                if (NowPlayingSong == TopTracksData.size()) {
+                if (NowPlayingSong == (TopTracksData.size()-1)) {
                     NowPlayingSong = 0;
                 } else {
                     NowPlayingSong = NowPlayingSong + 1;
@@ -122,6 +124,7 @@ public class SimplePlayerActivityFragment extends Fragment {
                     }
                     myMediaPlayer.stop();
                     myMediaPlayer.reset();
+                    durationHandler.removeCallbacksAndMessages(null);
                     pausedOrReset = "reset";
                     refreshViewsAndStartPlayer(rootView);
                     play_pause.setImageResource(android.R.drawable.ic_media_pause);
@@ -129,6 +132,7 @@ public class SimplePlayerActivityFragment extends Fragment {
                 else {
                     myMediaPlayer.stop();
                     myMediaPlayer.reset();
+                    durationHandler.removeCallbacksAndMessages(null);
                     pausedOrReset = "reset";
                     refreshViewsAndStartPlayer(rootView);
                     play_pause.setImageResource(android.R.drawable.ic_media_pause);
@@ -136,6 +140,32 @@ public class SimplePlayerActivityFragment extends Fragment {
             }
         });
 
+        myMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            public void onCompletion(MediaPlayer mp) {
+
+                if (NowPlayingSong > 0) {
+                    if (!myMediaPlayer.isPlaying()){
+                        NowPlayingSong = NowPlayingSong - 1;
+                    }
+                    myMediaPlayer.stop();
+                    myMediaPlayer.reset();
+                    durationHandler.removeCallbacksAndMessages(null);
+                    pausedOrReset = "reset";
+                    refreshViewsAndStartPlayer(rootView);
+                    play_pause.setImageResource(android.R.drawable.ic_media_pause);
+                }
+                else {
+                    myMediaPlayer.stop();
+                    myMediaPlayer.reset();
+                    durationHandler.removeCallbacksAndMessages(null);
+                    pausedOrReset = "reset";
+                    refreshViewsAndStartPlayer(rootView);
+                    play_pause.setImageResource(android.R.drawable.ic_media_pause);
+                }
+
+
+            }
+        });
 
         return rootView;
 
@@ -190,22 +220,22 @@ public class SimplePlayerActivityFragment extends Fragment {
             }
         });
 
-//        mySeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-//            @Override
-//            public void onStopTrackingTouch(SeekBar seekBar) {
-//            }
-//
-//            @Override
-//            public void onStartTrackingTouch(SeekBar seekBar) {
-//            }
-//
-//            @Override
-//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                if (fromUser) {
-//                    myMediaPlayer.seekTo(progress * 1000);
-//                }
-//            }
-//        });
+        mySeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    myMediaPlayer.seekTo(progress);
+                }
+            }
+        });
 
     }
 
