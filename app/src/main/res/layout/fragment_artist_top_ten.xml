@@ -7,7 +7,8 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context="app.com.example.android.spotifystreamer.ArtistTopTenActivityFragment">
+    tools:context="app.com.example.android.spotifystreamer.ArtistTopTenActivityFragment"
+    android:id="@+id/top10SongsList">
 
     <ListView
         android:id="@+id/listview_artistsTop10"

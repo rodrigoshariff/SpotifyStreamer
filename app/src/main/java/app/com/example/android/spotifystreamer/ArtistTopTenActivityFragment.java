@@ -1,9 +1,11 @@
 package app.com.example.android.spotifystreamer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -26,13 +28,15 @@ import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.Tracks;
 
 
-
 public class ArtistTopTenActivityFragment extends Fragment {
 
     ImageAndTwoTextsArrayAdapter mTop10SongsAdapter;
     List<RowItemFiveStrings> songNameAndImageURL = new ArrayList<>();
-    String countryPref = "US";
+    String countryPrefMaster = "US";
+    String countryPrefLocal = "US";
     String artistName = "";
+    String artistID = "";
+    private ListView listViewTop10 = null;
 
     public ArtistTopTenActivityFragment() {
     }
@@ -42,7 +46,8 @@ public class ArtistTopTenActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         final View rootView = inflater.inflate(R.layout.fragment_artist_top_ten, container, false);
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_artistsTop10);
+        //ListView listView = (ListView) rootView.findViewById(R.id.listview_artistsTop10);
+        listViewTop10 = (ListView) rootView.findViewById(R.id.listview_artistsTop10);
 
         //receive intent data from main activity
         Intent intent = getActivity().getIntent();
@@ -50,27 +55,32 @@ public class ArtistTopTenActivityFragment extends Fragment {
         if (intent != null) //&& intent.hasExtra(Intent.EXTRA_TEXT)) {
         {
             String[] IdAndNameArray = intent.getStringArrayExtra("IdAndNameArray");
-            String artistID = IdAndNameArray[0];
+            artistID = IdAndNameArray[0];
             artistName = IdAndNameArray[1];
-            countryPref = IdAndNameArray[2];
-            Log.d("COUNTRY_PREF_Child", "-----------> " + countryPref);
+            countryPrefMaster = IdAndNameArray[2];
 
-            ((ActionBarActivity) getActivity()).getSupportActionBar().setSubtitle(artistName + "  (" +countryPref+")");
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            countryPrefLocal = sharedPrefs.getString(getString(R.string.pref_country_key), getString(R.string.pref_country_US));
+
+            //Toast.makeText(getActivity(), "On Create Country " + countryPrefMaster +" "+countryPrefLocal, Toast.LENGTH_SHORT).show();
+            //Log.d("COUNTRY_PREF_Child", "-----------> " + countryPrefMaster);
+
+            ((ActionBarActivity) getActivity()).getSupportActionBar().setSubtitle(artistName + "  (" + countryPrefMaster + ")");
 
             //only query Spotify if entering this view for the first time, otherwise restore from saved instance state
-            if(songNameAndImageURL.isEmpty() || (songNameAndImageURL.size() == 0)) {
+            if (songNameAndImageURL.isEmpty() || (songNameAndImageURL.size() == 0)) {
 
                 QueryArtistsTop10FromSpotify artistTop10Search = new QueryArtistsTop10FromSpotify();
                 artistTop10Search.execute(artistID);
             }
 
-                mTop10SongsAdapter = new ImageAndTwoTextsArrayAdapter(getActivity(),
-                        R.id.list_item_top10, songNameAndImageURL);
-                listView.setAdapter(mTop10SongsAdapter);
+            mTop10SongsAdapter = new ImageAndTwoTextsArrayAdapter(getActivity(),
+                    R.id.list_item_top10, songNameAndImageURL);
+            listViewTop10.setAdapter(mTop10SongsAdapter);
 
         }
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listViewTop10.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -112,6 +122,30 @@ public class ArtistTopTenActivityFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        countryPrefLocal = sharedPrefs.getString(getString(R.string.pref_country_key), getString(R.string.pref_country_US));
+
+        if (!countryPrefLocal.equals(countryPrefMaster) )
+        {
+            //Toast.makeText(getActivity(), "On Resume Country " + countryPrefMaster +" "+countryPrefLocal, Toast.LENGTH_SHORT).show();
+            countryPrefMaster = countryPrefLocal;
+            songNameAndImageURL.clear();
+            QueryArtistsTop10FromSpotify artistTop10Search = new QueryArtistsTop10FromSpotify();
+            artistTop10Search.execute(artistID);
+
+            mTop10SongsAdapter = new ImageAndTwoTextsArrayAdapter(getActivity(),
+                    R.id.list_item_top10, songNameAndImageURL);
+            listViewTop10.setAdapter(mTop10SongsAdapter);
+
+            ((ActionBarActivity) getActivity()).getSupportActionBar().setSubtitle(artistName + "  (" + countryPrefMaster + ")");
+
+        }
+
+    }
+
     private class QueryArtistsTop10FromSpotify extends AsyncTask<String, Void, Tracks> {
 
         @Override
@@ -120,8 +154,8 @@ public class ArtistTopTenActivityFragment extends Fragment {
             SpotifyApi spotifyApi = new SpotifyApi();
             SpotifyService spotifyService = spotifyApi.getService();
             Map<String, Object> map = new HashMap<>();
-            map.put("country", countryPref);
-            Tracks topTracks = spotifyService.getArtistTopTrack(params[0],map);
+            map.put("country", countryPrefMaster);
+            Tracks topTracks = spotifyService.getArtistTopTrack(params[0], map);
 
             return topTracks;
         }
@@ -136,12 +170,9 @@ public class ArtistTopTenActivityFragment extends Fragment {
             String aImageUrllarge = "http://vignette2.wikia.nocookie.net/legendmarielu/images/b/b4/No_image_available.jpg/revision/latest?cb=20130511180903";
             String previewUrl = "No Preview";
 
-            if (topTracks.tracks.size() == 0)
-            {
-                Toast.makeText(getActivity(),"There are no tracks for this artist", Toast.LENGTH_SHORT).show();
-            }
-
-            else {
+            if (topTracks.tracks.size() == 0) {
+                Toast.makeText(getActivity(), "There are no tracks for this artist", Toast.LENGTH_SHORT).show();
+            } else {
                 for (Track t : topTracks.tracks) {
                     //Log.d("NAME", "-----------> " + t.name.toString() + " : ");
                     //Log.d("NAME", "-----------> " + t.album + " : ");
@@ -153,7 +184,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
                         //Log.d("IMAGES", "-----------> " + imgUrl.url + " : ");
                         if (imgUrl.width <= 200) {
                             aImageUrlsmall = imgUrl.url.toString();
-                        } else if (imgUrl.width >500 && imgUrl.width <= 700) {
+                        } else if (imgUrl.width > 500 && imgUrl.width <= 700) {
                             aImageUrllarge = imgUrl.url.toString();
                         }
                     }
