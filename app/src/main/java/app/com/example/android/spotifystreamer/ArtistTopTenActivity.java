@@ -13,6 +13,14 @@ public class ArtistTopTenActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_artist_top_ten);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.artist_top_ten_container, new ArtistTopTenActivityFragment())
+                    .commit();
+        }
+
+
     }
 
 
