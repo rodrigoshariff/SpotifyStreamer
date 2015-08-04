@@ -52,7 +52,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
         //receive intent data from main activity
         Intent intent = getActivity().getIntent();
 
-        if (intent != null) //&& intent.hasExtra(Intent.EXTRA_TEXT)) {
+        if (!(intent == null || intent.getData() == null))//&& intent.hasExtra(Intent.EXTRA_TEXT)) {
         {
             String[] IdAndNameArray = intent.getStringArrayExtra("IdAndNameArray");
             artistID = IdAndNameArray[0];

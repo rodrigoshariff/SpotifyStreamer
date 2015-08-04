@@ -1,6 +1,8 @@
 package app.com.example.android.spotifystreamer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,11 +13,17 @@ public class MainActivity extends ActionBarActivity {
 
     private static final String ARTISTTOPTEN_TAG = "TTTAG";
     private boolean mTwoPane;
+    String countryPrefLocal = "US";
+    String countryPrefMaster = "US";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        countryPrefMaster = sharedPrefs.getString(getString(R.string.pref_country_key), getString(R.string.pref_country_US));
+
 
         if (findViewById(R.id.artist_top_ten_container) != null) {
             // The detail container view will be present only in the large-screen layouts
@@ -36,6 +44,25 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        countryPrefLocal = sharedPrefs.getString(getString(R.string.pref_country_key), getString(R.string.pref_country_US));
+
+        if (countryPrefLocal != null && !countryPrefLocal.equals(countryPrefMaster) )
+        {
+                MainActivityFragment ff = (MainActivityFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+
+
+            //Toast.makeText(getActivity(), "On Resume Country " + countryPrefMaster +" "+countryPrefLocal, Toast.LENGTH_SHORT).show();
+            countryPrefMaster = countryPrefLocal;
+
+        }
+
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
