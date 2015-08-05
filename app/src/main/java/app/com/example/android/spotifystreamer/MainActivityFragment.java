@@ -36,6 +36,7 @@ public class MainActivityFragment extends Fragment {
     List<RowItemFiveStrings> artistNameAndImageURL = new ArrayList<>();
     String searchText = "";
     String countryPref = "US";
+    private boolean mTwoPane;
 
     public MainActivityFragment() {
     }
@@ -49,6 +50,12 @@ public class MainActivityFragment extends Fragment {
         EditText editText = (EditText) rootView.findViewById(R.id.searchText);
         if(searchText.length()>0) {editText.setText(searchText);};
 
+        if (getActivity().findViewById(R.id.artist_top_ten_container) != null) {
+            mTwoPane = true;
+        }
+        else {
+            mTwoPane = false;
+        }
         //search click
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -100,19 +107,29 @@ public class MainActivityFragment extends Fragment {
                 countryPref = sharedPrefs.getString(getString(R.string.pref_country_key), getString(R.string.pref_country_US));
                 Log.d("COUNTRY_PREF", "-----------> " + countryPref);
 
-                //prepare parameters to send to next activity/fragment
-                RowItemFiveStrings artistItem = mSearchArtistAdapter.getItem(position);
-                String artistID = artistNameAndImageURL.get(position).gettextColumn2();
-                String idAndName[] = {artistID, artistNameAndImageURL.get(position).gettextColumn0(), countryPref};
+//                if (mTwoPane == true) {
+//
+//                    Fragment details = new ArtistTopTenActivityFragment();
+//                    FragmentTransaction transac = getFragmentManager().beginTransaction();
+//                    transac.replace(R.id.artist_top_ten_container,details);
+//                    transac.commit();
+//                }
+//                else {
 
-                //send intent
-                //Toast.makeText(getActivity(), artistItem.getTextViewText() + " " + artistID, Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getActivity(), ArtistTopTenActivity.class);
-                        //.putExtra(Intent.EXTRA_TEXT, artistID);
-                intent.putExtra("IdAndNameArray", idAndName);
-                startActivity(intent);
+                    //prepare parameters to send to next activity/fragment
+                    RowItemFiveStrings artistItem = mSearchArtistAdapter.getItem(position);
+                    String artistID = artistNameAndImageURL.get(position).gettextColumn2();
+                    String idAndName[] = {artistID, artistNameAndImageURL.get(position).gettextColumn0(), countryPref};
 
-            }
+                    //send intent
+                    //Toast.makeText(getActivity(), artistItem.getTextViewText() + " " + artistID, Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getActivity(), ArtistTopTenActivity.class);
+                    //.putExtra(Intent.EXTRA_TEXT, artistID);
+                    intent.putExtra("IdAndNameArray", idAndName);
+                    startActivity(intent);
+                }
+
+            //}
         });
 
         return rootView;

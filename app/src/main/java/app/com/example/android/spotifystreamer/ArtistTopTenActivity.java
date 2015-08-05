@@ -20,7 +20,6 @@ public class ArtistTopTenActivity extends ActionBarActivity {
                     .commit();
         }
 
-
     }
 
 
