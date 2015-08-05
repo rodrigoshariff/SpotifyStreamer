@@ -9,7 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements MainActivityFragment.OnArtistSelectedListener {
 
     private static final String ARTISTTOPTEN_TAG = "TTTAG";
     private boolean mTwoPane;
@@ -41,28 +41,44 @@ public class MainActivity extends ActionBarActivity {
         } else {
             mTwoPane = false;
         }
-
     }
 
-    @Override
+
+    public void onArtistSelected(String[] idAndName) {
+        if (mTwoPane) {
+            // In two-pane mode, show the detail view in this activity by
+            // adding or replacing the detail fragment using a
+            // fragment transaction.
+            Bundle args = new Bundle();
+            args.putStringArray("IdAndNameArray", idAndName);
+
+            ArtistTopTenActivityFragment fragment = new ArtistTopTenActivityFragment();
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.artist_top_ten_container, fragment)
+                    .commit();
+        } else {
+            Intent intent = new Intent(this, ArtistTopTenActivity.class);
+            intent.putExtra("IdAndNameArray", idAndName);
+            startActivity(intent);
+        }
+    }
+
+
+
+/*    @Override
     protected void onResume() {
         super.onResume();
-
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         countryPrefLocal = sharedPrefs.getString(getString(R.string.pref_country_key), getString(R.string.pref_country_US));
-
         if (countryPrefLocal != null && !countryPrefLocal.equals(countryPrefMaster) )
         {
                 MainActivityFragment ff = (MainActivityFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main);
-
-
             //Toast.makeText(getActivity(), "On Resume Country " + countryPrefMaster +" "+countryPrefLocal, Toast.LENGTH_SHORT).show();
             countryPrefMaster = countryPrefLocal;
-
         }
-
-
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

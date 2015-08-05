@@ -23,9 +23,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class SimplePlayerActivityFragment extends Fragment {
 
     List<RowItemFiveStrings> TopTracksData = new ArrayList<>();
@@ -143,26 +140,17 @@ public class SimplePlayerActivityFragment extends Fragment {
         myMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             public void onCompletion(MediaPlayer mp) {
 
-                if (NowPlayingSong > 0) {
-                    if (!myMediaPlayer.isPlaying()){
-                        NowPlayingSong = NowPlayingSong - 1;
-                    }
-                    myMediaPlayer.stop();
-                    myMediaPlayer.reset();
-                    durationHandler.removeCallbacksAndMessages(null);
-                    pausedOrReset = "reset";
-                    refreshViewsAndStartPlayer(rootView);
-                    play_pause.setImageResource(android.R.drawable.ic_media_pause);
+                myMediaPlayer.stop();
+                myMediaPlayer.reset();
+                durationHandler.removeCallbacksAndMessages(null);
+                pausedOrReset = "reset";
+                if (NowPlayingSong == (TopTracksData.size()-1)) {
+                    NowPlayingSong = 0;
+                } else {
+                    NowPlayingSong = NowPlayingSong + 1;
                 }
-                else {
-                    myMediaPlayer.stop();
-                    myMediaPlayer.reset();
-                    durationHandler.removeCallbacksAndMessages(null);
-                    pausedOrReset = "reset";
-                    refreshViewsAndStartPlayer(rootView);
-                    play_pause.setImageResource(android.R.drawable.ic_media_pause);
-                }
-
+                refreshViewsAndStartPlayer(rootView);
+                play_pause.setImageResource(android.R.drawable.ic_media_pause);
 
             }
         });

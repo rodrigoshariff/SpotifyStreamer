@@ -1,5 +1,6 @@
 package app.com.example.android.spotifystreamer;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,6 +32,14 @@ import kaaes.spotify.webapi.android.models.Image;
 
 
 public class MainActivityFragment extends Fragment {
+
+    OnArtistSelectedListener mCallback;
+
+    // The container Activity must implement this interface so the frag can deliver messages
+    public interface OnArtistSelectedListener {
+        /** Called by MainFragment when a list item is selected */
+        public void onArtistSelected(String[] idAndName);
+    }
 
     ImageAndTextArrayAdapter mSearchArtistAdapter;
     List<RowItemFiveStrings> artistNameAndImageURL = new ArrayList<>();
@@ -107,26 +116,22 @@ public class MainActivityFragment extends Fragment {
                 countryPref = sharedPrefs.getString(getString(R.string.pref_country_key), getString(R.string.pref_country_US));
                 Log.d("COUNTRY_PREF", "-----------> " + countryPref);
 
-//                if (mTwoPane == true) {
-//
-//                    Fragment details = new ArtistTopTenActivityFragment();
-//                    FragmentTransaction transac = getFragmentManager().beginTransaction();
-//                    transac.replace(R.id.artist_top_ten_container,details);
-//                    transac.commit();
-//                }
-//                else {
-
                     //prepare parameters to send to next activity/fragment
-                    RowItemFiveStrings artistItem = mSearchArtistAdapter.getItem(position);
-                    String artistID = artistNameAndImageURL.get(position).gettextColumn2();
-                    String idAndName[] = {artistID, artistNameAndImageURL.get(position).gettextColumn0(), countryPref};
+                    //RowItemFiveStrings artistItem = mSearchArtistAdapter.getItem(position);
+                String artistID = artistNameAndImageURL.get(position).gettextColumn2();
+                String idAndName[] = {artistID, artistNameAndImageURL.get(position).gettextColumn0(), countryPref};
 
                     //send intent
                     //Toast.makeText(getActivity(), artistItem.getTextViewText() + " " + artistID, Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getActivity(), ArtistTopTenActivity.class);
-                    //.putExtra(Intent.EXTRA_TEXT, artistID);
-                    intent.putExtra("IdAndNameArray", idAndName);
-                    startActivity(intent);
+
+/*              send intent.  original code for phone only
+                Intent intent = new Intent(getActivity(), ArtistTopTenActivity.class);
+                intent.putExtra("IdAndNameArray", idAndName);
+                startActivity(intent);*/
+
+                //send parameter to container activity MainActivity to start top ten activity or start top ten fragment on tablet layout
+                mCallback.onArtistSelected(idAndName);
+
                 }
 
             //}
@@ -154,6 +159,23 @@ public class MainActivityFragment extends Fragment {
         listView.setAdapter(mSearchArtistAdapter);
 
     }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception.
+        try {
+            mCallback = (OnArtistSelectedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnArtistSelectedListener");
+        }
+    }
+
+
+
 
 
     //query Spotify API

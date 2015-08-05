@@ -49,8 +49,39 @@ public class ArtistTopTenActivityFragment extends Fragment {
         //ListView listView = (ListView) rootView.findViewById(R.id.listview_artistsTop10);
         listViewTop10 = (ListView) rootView.findViewById(R.id.listview_artistsTop10);
 
-        //receive intent data from main activity
-        Intent intent = getActivity().getIntent();
+        //receive intent data from activity
+
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            String[] IdAndNameArray = arguments.getStringArray("IdAndNameArray");
+
+            artistID = IdAndNameArray[0];
+            artistName = IdAndNameArray[1];
+            countryPrefMaster = IdAndNameArray[2];
+
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            countryPrefLocal = sharedPrefs.getString(getString(R.string.pref_country_key), getString(R.string.pref_country_US));
+
+            //Toast.makeText(getActivity(), "On Create Country " + countryPrefMaster +" "+countryPrefLocal, Toast.LENGTH_SHORT).show();
+            //Log.d("COUNTRY_PREF_Child", "-----------> " + countryPrefMaster);
+
+            ((ActionBarActivity) getActivity()).getSupportActionBar().setSubtitle(artistName + "  (" + countryPrefMaster + ")");
+
+            //only query Spotify if entering this view for the first time, otherwise restore from saved instance state
+            if (songNameAndImageURL.isEmpty() || (songNameAndImageURL.size() == 0)) {
+
+                QueryArtistsTop10FromSpotify artistTop10Search = new QueryArtistsTop10FromSpotify();
+                artistTop10Search.execute(artistID);
+            }
+
+            mTop10SongsAdapter = new ImageAndTwoTextsArrayAdapter(getActivity(),
+                    R.id.list_item_top10, songNameAndImageURL);
+            listViewTop10.setAdapter(mTop10SongsAdapter);
+
+        }
+
+
+/*        Intent intent = getActivity().getIntent();
 
         if (!(intent == null || intent.getData() == null))//&& intent.hasExtra(Intent.EXTRA_TEXT)) {
         {
@@ -78,7 +109,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
                     R.id.list_item_top10, songNameAndImageURL);
             listViewTop10.setAdapter(mTop10SongsAdapter);
 
-        }
+        }*/
 
         listViewTop10.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
