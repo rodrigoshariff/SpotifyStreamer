@@ -8,7 +8,6 @@ import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -149,7 +148,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
             // Restore value of members from saved state
             //List<RowItemFiveStrings> savedSongNameAndImageURL = new ArrayList<>();
             songNameAndImageURL = savedInstanceState.getParcelableArrayList("SongsArray");
-            Log.d("SavedInstanceArray", "-----------> " + songNameAndImageURL.get(0).gettextColumn0());
+            //Log.d("SavedInstanceArray", "-----------> " + songNameAndImageURL.get(0).gettextColumn0());
         }
     }
 
