@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +37,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
     String artistName = "";
     String artistID = "";
     private ListView listViewTop10 = null;
+    private boolean mTwoPane = false;
 
     public ArtistTopTenActivityFragment() {
     }
@@ -53,6 +55,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
         Bundle arguments = getArguments();
         if (arguments != null) {
             String[] IdAndNameArray = arguments.getStringArray("IdAndNameArray");
+            mTwoPane = arguments.getBoolean("mTwoPane");
 
             artistID = IdAndNameArray[0];
             artistName = IdAndNameArray[1];
@@ -115,12 +118,39 @@ public class ArtistTopTenActivityFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
+                if (mTwoPane) {
+                    // In two-pane mode, show the detail view in this activity by
+                    // adding or replacing the detail fragment using a
+                    // fragment transaction.
+                    Bundle args = new Bundle();
+                    args.putParcelableArrayList("TopTracksData", (ArrayList<? extends Parcelable>) songNameAndImageURL);
+                    args.putInt("SelectedSong", position);
+                    args.putString("ArtistName", artistName);
+
+                    FragmentManager fragmentManager = getFragmentManager();
+                    SimplePlayerDialogFragment playerDialogFragment = new SimplePlayerDialogFragment();
+                    playerDialogFragment.setArguments(args);
+                    playerDialogFragment.show(fragmentManager, "dialog");
+
+
+                } else {
+                    Intent intent = new Intent(getActivity(), SimplePlayerActivity.class);
+                    //.putExtra(Intent.EXTRA_TEXT, artistID);
+                    intent.putParcelableArrayListExtra("TopTracksData", (ArrayList<? extends Parcelable>) songNameAndImageURL);
+                    intent.putExtra("SelectedSong", position);
+                    intent.putExtra("ArtistName", artistName);
+                    startActivity(intent);
+                }
+
+
+
+/* Original code
                 Intent intent = new Intent(getActivity(), SimplePlayerActivity.class);
                 //.putExtra(Intent.EXTRA_TEXT, artistID);
                 intent.putParcelableArrayListExtra("TopTracksData", (ArrayList<? extends Parcelable>) songNameAndImageURL);
                 intent.putExtra("SelectedSong", position);
                 intent.putExtra("ArtistName", artistName);
-                startActivity(intent);
+                startActivity(intent);*/
 
             }
         });

@@ -49,8 +49,10 @@ public class MainActivity extends ActionBarActivity implements MainActivityFragm
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
+
             Bundle args = new Bundle();
             args.putStringArray("IdAndNameArray", idAndName);
+            args.putBoolean("mTwoPane",mTwoPane);
 
             ArtistTopTenActivityFragment fragment = new ArtistTopTenActivityFragment();
             fragment.setArguments(args);
@@ -61,6 +63,7 @@ public class MainActivity extends ActionBarActivity implements MainActivityFragm
         } else {
             Intent intent = new Intent(this, ArtistTopTenActivity.class);
             intent.putExtra("IdAndNameArray", idAndName);
+            intent.putExtra("mTwoPane",mTwoPane);
             startActivity(intent);
         }
     }
