@@ -1,17 +1,43 @@
 package app.com.example.android.spotifystreamer;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class SimplePlayerActivity extends ActionBarActivity {
+
+    List<RowItemFiveStrings> songNameAndImageURL = new ArrayList<>();
+    int position = 0;
+    String artistName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_simple_player);
+
+
+        if (savedInstanceState == null) {
+
+            Bundle args = new Bundle();
+            args.putParcelableArrayList("TopTracksData", getIntent().getParcelableArrayListExtra("TopTracksData"));
+            args.putInt("SelectedSong", getIntent().getIntExtra("SelectedSong",0));
+            args.putString("ArtistName", getIntent().getStringExtra("ArtistName"));
+
+            SimplePlayerDialogFragment fragment = new SimplePlayerDialogFragment();
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.player_container, fragment)
+                    .commit();
+        }
+
+
     }
 
 

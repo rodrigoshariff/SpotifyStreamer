@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +38,9 @@ public class MainActivityFragment extends Fragment {
 
     // The container Activity must implement this interface so the frag can deliver messages
     public interface OnArtistSelectedListener {
-        /** Called by MainFragment when a list item is selected */
+        /**
+         * Called by MainFragment when a list item is selected
+         */
         public void onArtistSelected(String[] idAndName);
     }
 
@@ -57,12 +60,14 @@ public class MainActivityFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         final ListView listView = (ListView) rootView.findViewById(R.id.listview_artists);
         EditText editText = (EditText) rootView.findViewById(R.id.searchText);
-        if(searchText.length()>0) {editText.setText(searchText);};
+        if (searchText.length() > 0) {
+            editText.setText(searchText);
+        }
+        ;
 
         if (getActivity().findViewById(R.id.artist_top_ten_container) != null) {
             mTwoPane = true;
-        }
-        else {
+        } else {
             mTwoPane = false;
         }
         //search click
@@ -77,13 +82,10 @@ public class MainActivityFragment extends Fragment {
                         editText.clearFocus();
 
                         //populate listwiew with spotify query results
-                        try {
-                            QueryArtistsFromSpotify artistSearch = new QueryArtistsFromSpotify();
-                            artistSearch.execute(editText.getText().toString());
-                            refreshListView(rootView);
-                        }
-                        finally {
-                        }
+                        QueryArtistsFromSpotify artistSearch = new QueryArtistsFromSpotify();
+                        artistSearch.execute(editText.getText().toString());
+                        refreshListView(rootView);
+
 
                         //hide keyboard
                         InputMethodManager in = (InputMethodManager) getActivity().
@@ -116,13 +118,13 @@ public class MainActivityFragment extends Fragment {
                 countryPref = sharedPrefs.getString(getString(R.string.pref_country_key), getString(R.string.pref_country_US));
                 Log.d("COUNTRY_PREF", "-----------> " + countryPref);
 
-                    //prepare parameters to send to next activity/fragment
-                    //RowItemFiveStrings artistItem = mSearchArtistAdapter.getItem(position);
+                //prepare parameters to send to next activity/fragment
+                //RowItemFiveStrings artistItem = mSearchArtistAdapter.getItem(position);
                 String artistID = artistNameAndImageURL.get(position).gettextColumn2();
                 String idAndName[] = {artistID, artistNameAndImageURL.get(position).gettextColumn0(), countryPref};
 
-                    //send intent
-                    //Toast.makeText(getActivity(), artistItem.getTextViewText() + " " + artistID, Toast.LENGTH_SHORT).show();
+                //send intent
+                //Toast.makeText(getActivity(), artistItem.getTextViewText() + " " + artistID, Toast.LENGTH_SHORT).show();
 
 /*              send intent.  original code for phone only
                 Intent intent = new Intent(getActivity(), ArtistTopTenActivity.class);
@@ -132,7 +134,7 @@ public class MainActivityFragment extends Fragment {
                 //send parameter to container activity MainActivity to start top ten activity or start top ten fragment on tablet layout
                 mCallback.onArtistSelected(idAndName);
 
-                }
+            }
 
             //}
         });
@@ -150,11 +152,11 @@ public class MainActivityFragment extends Fragment {
 
 
     //populate artist listview
-    private void refreshListView(View rootView){
+    private void refreshListView(View rootView) {
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_artists);
         mSearchArtistAdapter = new ImageAndTextArrayAdapter(getActivity(),
-                R.id.list_item_search_artist, artistNameAndImageURL );
+                R.id.list_item_search_artist, artistNameAndImageURL);
 
         listView.setAdapter(mSearchArtistAdapter);
 
@@ -175,9 +177,6 @@ public class MainActivityFragment extends Fragment {
     }
 
 
-
-
-
     //query Spotify API
     private class QueryArtistsFromSpotify extends AsyncTask<String, Void, ArtistsPager> {
 
@@ -188,32 +187,38 @@ public class MainActivityFragment extends Fragment {
 
             SpotifyApi spotifyApi = new SpotifyApi();
             SpotifyService spotifyService = spotifyApi.getService();
-            ArtistsPager artistsPager = spotifyService.searchArtists(params[0]);
+            try {
+                ArtistsPager artistsPager = spotifyService.searchArtists(params[0]);
+                return artistsPager;
+            } catch (Exception e) {
 
-            return artistsPager;
+                Log.e(LOG_TAG, "Error ==========>: " + e.getMessage(), e);
+                //Toast.makeText(getActivity(), "Unable to connect", Toast.LENGTH_SHORT).show();
+                return null;
+            }
         }
 
 
         @Override
         protected void onPostExecute(ArtistsPager artistsPager) {
             //super.onPostExecute(artistsPager);
+
             artistNameAndImageURL.clear();
             String aName = "No Name";
             String aImageUrl = "http://vignette2.wikia.nocookie.net/legendmarielu/images/b/b4/No_image_available.jpg/revision/latest?cb=20130511180903";
             String aID = "No ID";
 
-            if (artistsPager.artists.items.size() == 0)
-            {
-                Toast.makeText(getActivity(),"Your search did not return any artist", Toast.LENGTH_SHORT).show();
-            }
-            else {
+            if (artistsPager == null || artistsPager.artists.items.size() == 0 ) {
+                if(artistsPager == null) {
+                    Toast.makeText(getActivity(), "Check internet connection", Toast.LENGTH_SHORT).show();}
+                else {
+                    Toast.makeText(getActivity(), "Your search did not return any artist", Toast.LENGTH_SHORT).show();
+                }
+            } else {
                 for (Artist a : artistsPager.artists.items) {
-                    //Log.d("NAME", "-----------> " + a.name.toString() + " : ");
-                    //Log.d("ID", "-----------> " + a.id.toString() + " : ");
 
                     aName = a.name.toString();
                     aID = a.id.toString();
-                    //spotifyId.add(a.id);
 
                     for (Image imgUrl : a.images) {
                         //Log.d("IMAGES", "-----------> " + imgUrl.url + " : ");
