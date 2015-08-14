@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +30,7 @@ public class SimplePlayerDialogFragment extends DialogFragment {
     int NowPlayingSong = 0;
     String artistName = "";
     String pausedOrReset = "";
+    boolean isFirstTime = true;
     MediaPlayer myMediaPlayer = new MediaPlayer();
     Handler durationHandler = new Handler();
     double timeElapsed = 0, finalTime =0;
@@ -61,7 +63,8 @@ public class SimplePlayerDialogFragment extends DialogFragment {
         final ImageButton play_pause = (ImageButton) rootView.findViewById(R.id.play_pause);
         final ImageButton next_track = (ImageButton) rootView.findViewById(R.id.next_track);
         final ImageButton previous_track = (ImageButton) rootView.findViewById(R.id.previous_track);
-
+        isFirstTime = true;
+        //Toast.makeText(getActivity(), "onCreateView", Toast.LENGTH_SHORT).show();
         //Intent intent = getActivity().getIntent();
 
         //original code
@@ -281,17 +284,25 @@ public class SimplePlayerDialogFragment extends DialogFragment {
 
     @Override
     public void onStop() {
-        durationHandler.removeCallbacksAndMessages(null);
+        //durationHandler.removeCallbacksAndMessages(null);
+
         if (myMediaPlayer != null) {
             myMediaPlayer.release();
             myMediaPlayer = null;
         }
+
+/*        if (myMediaPlayer != null) {
+            myMediaPlayer.pause();
+        }*/
+        isFirstTime=false;
         super.onStop();
+
     }
 
     @Override
     public void onDestroy() {
         durationHandler.removeCallbacksAndMessages(null);
+
         if (myMediaPlayer != null) {
             myMediaPlayer.release();
             myMediaPlayer = null;
@@ -301,12 +312,27 @@ public class SimplePlayerDialogFragment extends DialogFragment {
 
     @Override
     public void onPause() {
-        durationHandler.removeCallbacksAndMessages(null);
+        //durationHandler.removeCallbacksAndMessages(null);
+
         if (myMediaPlayer != null) {
             myMediaPlayer.release();
             myMediaPlayer = null;
         }
+/*        if (myMediaPlayer != null) {
+            myMediaPlayer.pause();
+        }*/
+        isFirstTime = false;
         super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+
+        if (isFirstTime == false)  {
+            //Toast.makeText(getActivity(), "go back up the stack", Toast.LENGTH_SHORT).show();
+            NavUtils.navigateUpFromSameTask(getActivity());
+        }
+        super.onResume();
     }
 
     public interface OnFragmentInteractionListener {
