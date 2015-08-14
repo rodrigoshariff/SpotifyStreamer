@@ -286,14 +286,15 @@ public class SimplePlayerDialogFragment extends DialogFragment {
     public void onStop() {
         //durationHandler.removeCallbacksAndMessages(null);
 
-        if (myMediaPlayer != null) {
+/*        if (myMediaPlayer != null) {
             myMediaPlayer.release();
             myMediaPlayer = null;
+        }*/
+
+        if (myMediaPlayer != null) {
+            myMediaPlayer.pause();
         }
 
-/*        if (myMediaPlayer != null) {
-            myMediaPlayer.pause();
-        }*/
         isFirstTime=false;
         super.onStop();
 
@@ -314,13 +315,15 @@ public class SimplePlayerDialogFragment extends DialogFragment {
     public void onPause() {
         //durationHandler.removeCallbacksAndMessages(null);
 
-        if (myMediaPlayer != null) {
+/*        if (myMediaPlayer != null) {
             myMediaPlayer.release();
             myMediaPlayer = null;
-        }
-/*        if (myMediaPlayer != null) {
-            myMediaPlayer.pause();
         }*/
+
+        if (myMediaPlayer != null) {
+            myMediaPlayer.pause();
+        }
+
         isFirstTime = false;
         super.onPause();
     }
@@ -329,8 +332,9 @@ public class SimplePlayerDialogFragment extends DialogFragment {
     public void onResume() {
 
         if (isFirstTime == false)  {
+            myMediaPlayer.start();
             //Toast.makeText(getActivity(), "go back up the stack", Toast.LENGTH_SHORT).show();
-            NavUtils.navigateUpFromSameTask(getActivity());
+            //NavUtils.navigateUpFromSameTask(getActivity());
         }
         super.onResume();
     }
